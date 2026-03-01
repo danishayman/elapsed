@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/event_model.dart';
 import '../services/storage_service.dart';
+import '../services/widget_service.dart';
 import '../widgets/event_card.dart';
 import 'add_event_screen.dart';
 
@@ -68,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (confirmed == true) {
       setState(() => _events.removeAt(index));
       await StorageService.saveEvents(_events);
+      await WidgetService.updateWidgets();
     }
   }
 

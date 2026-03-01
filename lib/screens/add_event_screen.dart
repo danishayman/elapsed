@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/event_model.dart';
 import '../services/storage_service.dart';
+import '../services/widget_service.dart';
 import '../widgets/color_picker_grid.dart';
 
 const _paletteColors = [
@@ -111,6 +112,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     final events = await StorageService.loadEvents();
     events.add(event);
     await StorageService.saveEvents(events);
+    await WidgetService.updateWidgets();
 
     if (mounted) Navigator.pop(context, true);
   }

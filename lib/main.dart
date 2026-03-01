@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/info_screen.dart';
+import 'services/widget_service.dart';
 
 void main() => runApp(const ElapsedApp());
 
@@ -35,10 +36,31 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
 
   final _pages = const [HomeScreen(), InfoScreen()];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Push initial data to widgets on launch
+    WidgetService.updateWidgets();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      WidgetService.updateWidgets();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
