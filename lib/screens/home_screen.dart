@@ -5,6 +5,7 @@ import '../services/storage_service.dart';
 import '../services/widget_service.dart';
 import '../widgets/event_card.dart';
 import 'add_event_screen.dart';
+import 'event_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -81,6 +82,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result == true) _loadEvents();
   }
 
+  Future<void> _navigateToDetail(EventModel event) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)),
+    );
+    _loadEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -151,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return EventCard(
                           event: event,
                           elapsed: elapsed,
+                          onTap: () => _navigateToDetail(event),
                           onLongPress: () => _deleteEvent(index),
                         );
                       },

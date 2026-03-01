@@ -23,7 +23,9 @@ const _paletteColors = [
 ];
 
 class AddEventScreen extends StatefulWidget {
-  const AddEventScreen({super.key});
+  final EventModel? editEvent;
+
+  const AddEventScreen({super.key, this.editEvent});
 
   @override
   State<AddEventScreen> createState() => _AddEventScreenState();
@@ -34,6 +36,18 @@ class _AddEventScreenState extends State<AddEventScreen> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _selectedColor = _paletteColors[0];
+
+  @override
+  void initState() {
+    super.initState();
+    final edit = widget.editEvent;
+    if (edit != null) {
+      _titleController.text = edit.title;
+      _selectedDate = edit.startDateTime;
+      _selectedTime = TimeOfDay.fromDateTime(edit.startDateTime);
+      _selectedColor = edit.colorHex;
+    }
+  }
 
   @override
   void dispose() {
@@ -103,14 +117,21 @@ class _AddEventScreenState extends State<AddEventScreen> {
     );
 
     final event = EventModel(
-      id: const Uuid().v4(),
+      id: widget.editEvent?.id ?? const Uuid().v4(),
       title: title,
       startDateTime: startDateTime,
       colorHex: _selectedColor,
+      goalDays: widget.editEvent?.goalDays,
+      resetHistory: widget.editEvent?.resetHistory,
     );
 
     final events = await StorageService.loadEvents();
-    events.add(event);
+    if (widget.editEvent != null) {
+      final idx = events.indexWhere((e) => e.id == event.id);
+      if (idx != -1) events[idx] = event;
+    } else {
+      events.add(event);
+    }
     await StorageService.saveEvents(events);
     await WidgetService.updateWidgets();
 
@@ -130,7 +151,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Event'),
+        title: Text(widget.editEvent != null ? 'Edit Event' : 'Add New Event'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),

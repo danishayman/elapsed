@@ -4,12 +4,14 @@ import '../models/event_model.dart';
 class EventCard extends StatelessWidget {
   final EventModel event;
   final Duration elapsed;
+  final VoidCallback onTap;
   final VoidCallback onLongPress;
 
   const EventCard({
     super.key,
     required this.event,
     required this.elapsed,
+    required this.onTap,
     required this.onLongPress,
   });
 
@@ -28,6 +30,7 @@ class EventCard extends StatelessWidget {
     );
 
     return GestureDetector(
+      onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
