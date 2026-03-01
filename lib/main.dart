@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/info_screen.dart';
 import 'services/widget_service.dart';
+import 'theme.dart';
 
 void main() => runApp(const ElapsedApp());
 
@@ -13,17 +14,7 @@ class ElapsedApp extends StatelessWidget {
     return MaterialApp(
       title: 'Elapsed',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF121212),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF7C3AED),
-          surface: Color(0xFF121212),
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF121212),
-          elevation: 0,
-        ),
-      ),
+      theme: buildAppTheme(),
       home: const MainShell(),
     );
   }
@@ -69,10 +60,11 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
-        backgroundColor: const Color(0xFF1A1A1A),
-        selectedItemColor: const Color(0xFF7C3AED),
-        unselectedItemColor: Colors.grey[600],
+        backgroundColor: kBgBlack,
+        selectedItemColor: kAccent,
+        unselectedItemColor: kTextTertiary,
         type: BottomNavigationBarType.fixed,
+        elevation: 0,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_rounded),

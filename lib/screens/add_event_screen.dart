@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../models/event_model.dart';
 import '../services/storage_service.dart';
 import '../services/widget_service.dart';
+import '../theme.dart';
 import '../widgets/color_picker_grid.dart';
 
 const _paletteColors = [
@@ -71,7 +72,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(primary: Color(0xFF7C3AED)),
+          colorScheme: const ColorScheme.dark(primary: kAccent),
         ),
         child: child!,
       ),
@@ -85,7 +86,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
       initialTime: _selectedTime ?? TimeOfDay.now(),
       builder: (context, child) => Theme(
         data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(primary: Color(0xFF7C3AED)),
+          colorScheme: const ColorScheme.dark(primary: kAccent),
         ),
         child: child!,
       ),
@@ -152,7 +153,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.editEvent != null ? 'Edit Event' : 'Add New Event'),
-        backgroundColor: Colors.transparent,
+        backgroundColor: kBgBlack,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -163,19 +164,19 @@ class _AddEventScreenState extends State<AddEventScreen> {
             // Title field
             const Text(
               'Event Title',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+              style: TextStyle(color: kTextSecondary, fontSize: 13),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _titleController,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: kTextPrimary),
               decoration: InputDecoration(
                 hintText: 'e.g. No smoking',
-                hintStyle: TextStyle(color: Colors.grey[600]),
+                hintStyle: const TextStyle(color: kTextTertiary),
                 filled: true,
-                fillColor: const Color(0xFF1E1E1E),
+                fillColor: kCardDark,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(kCardRadius),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -191,9 +192,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
             const Text(
               'Quick Start',
               style: TextStyle(
-                color: Colors.white,
+                color: kTextPrimary,
                 fontSize: 15,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 10),
@@ -204,10 +205,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
                 icon: const Icon(Icons.play_arrow_rounded, size: 20),
                 label: const Text('START FROM NOW'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF7C3AED),
-                  side: const BorderSide(color: Color(0xFF7C3AED)),
+                  foregroundColor: kAccent,
+                  side: const BorderSide(color: kAccent),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(kCardRadius),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
@@ -220,9 +221,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
             const Text(
               'Or Select Custom Date & Time',
               style: TextStyle(
-                color: Colors.white,
+                color: kTextPrimary,
                 fontSize: 15,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 10),
@@ -256,9 +257,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
             const Text(
               'Select Color',
               style: TextStyle(
-                color: Colors.white,
+                color: kTextPrimary,
                 fontSize: 15,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 12),
@@ -273,20 +274,20 @@ class _AddEventScreenState extends State<AddEventScreen> {
             // Save button
             SizedBox(
               width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
+              height: 48,
+              child: OutlinedButton(
                 onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF7C3AED),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kAccent,
+                  side: const BorderSide(color: kAccent),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(kCardRadius),
                   ),
                 ),
                 child: const Text(
                   'SAVE EVENT',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1,
                   ),
@@ -319,9 +320,11 @@ class _PickerButton extends StatelessWidget {
       icon: Icon(icon, size: 18),
       label: Text(label, style: const TextStyle(fontSize: 13)),
       style: OutlinedButton.styleFrom(
-        foregroundColor: Colors.white70,
-        side: BorderSide(color: Colors.grey[700]!),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        foregroundColor: kTextSecondary,
+        side: const BorderSide(color: kDivider),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(kCardRadius),
+        ),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       ),
     );

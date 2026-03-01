@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme.dart';
 
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
@@ -15,9 +16,9 @@ class InfoScreen extends StatelessWidget {
               const Text(
                 'About',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+                  color: kTextPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 24),
@@ -25,8 +26,8 @@ class InfoScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.circular(16),
+                  color: kCardDark,
+                  borderRadius: BorderRadius.circular(kCardRadius),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,55 +37,53 @@ class InfoScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF7C3AED,
-                            ).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
+                            color: kAccent.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(kCardRadius),
                           ),
                           child: const Icon(
                             Icons.timer_outlined,
-                            color: Color(0xFF7C3AED),
-                            size: 28,
+                            color: kAccent,
+                            size: 24,
                           ),
                         ),
                         const SizedBox(width: 14),
                         const Text(
                           'Elapsed',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
+                            color: kTextPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    Text(
+                    const Text(
                       'Elapsed helps you track how long it has been since '
                       'important personal events. Whether you\'re counting days '
                       'smoke-free, tracking your gym streak, or remembering '
                       'milestones — this app keeps a live, real-time counter for '
                       'each event.',
                       style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 15,
+                        color: kTextSecondary,
+                        fontSize: 14,
                         height: 1.6,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    _InfoTile(
+                    const _InfoTile(
                       icon: Icons.add_circle_outline,
                       text: 'Tap "+ ADD EVENT" to create a new tracker',
                     ),
-                    _InfoTile(
+                    const _InfoTile(
                       icon: Icons.palette_outlined,
                       text: 'Choose a color to personalise each event',
                     ),
-                    _InfoTile(
+                    const _InfoTile(
                       icon: Icons.touch_app_outlined,
                       text: 'Long-press an event card to delete it',
                     ),
-                    _InfoTile(
+                    const _InfoTile(
                       icon: Icons.save_outlined,
                       text: 'Events are saved locally on your device',
                     ),
@@ -92,10 +91,10 @@ class InfoScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Center(
+              const Center(
                 child: Text(
                   'v1.0.0',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  style: TextStyle(color: kTextTertiary, fontSize: 13),
                 ),
               ),
             ],
@@ -118,12 +117,12 @@ class _InfoTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF7C3AED), size: 20),
+          Icon(icon, color: kAccent, size: 18),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(color: Colors.grey[300], fontSize: 14),
+              style: const TextStyle(color: kTextSecondary, fontSize: 14),
             ),
           ),
         ],

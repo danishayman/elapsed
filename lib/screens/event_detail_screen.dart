@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import '../models/event_model.dart';
 import '../services/storage_service.dart';
 import '../services/widget_service.dart';
+import '../theme.dart';
 import 'add_event_screen.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -37,9 +38,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   // ── Helpers ──────────────────────────────────────────────
-
-  Color get _accentColor =>
-      Color(int.parse('FF${_event.colorHex.replaceFirst('#', '')}', radix: 16));
 
   Duration get _elapsed => DateTime.now().difference(_event.startDateTime);
 
@@ -113,11 +111,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     if (idx != -1) events[idx] = updated;
     await StorageService.saveEvents(events);
     await WidgetService.updateWidgets();
-    if (mounted)
+    if (mounted) {
       setState(() {
         _event = updated;
         _changed = true;
       });
+    }
   }
 
   Future<void> _setGoal() async {
@@ -127,20 +126,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final result = await showDialog<int>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF252525),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Set Goal', style: TextStyle(color: Colors.white)),
+        backgroundColor: kCardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(kCardRadius),
+        ),
+        title: const Text('Set Goal', style: TextStyle(color: kTextPrimary)),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: kTextPrimary),
           decoration: InputDecoration(
             hintText: 'Number of days',
-            hintStyle: TextStyle(color: Colors.grey[600]),
+            hintStyle: const TextStyle(color: kTextTertiary),
             filled: true,
-            fillColor: const Color(0xFF1E1E1E),
+            fillColor: kCardDarkAlt,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(kCardRadius),
               borderSide: BorderSide.none,
             ),
           ),
@@ -148,17 +149,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('CANCEL', style: TextStyle(color: Colors.grey[400])),
+            child: const Text('CANCEL', style: TextStyle(color: kTextTertiary)),
           ),
           TextButton(
             onPressed: () {
               final val = int.tryParse(controller.text.trim());
               if (val != null && val > 0) Navigator.pop(ctx, val);
             },
-            child: const Text(
-              'SET',
-              style: TextStyle(color: Color(0xFF7C3AED)),
-            ),
+            child: const Text('SET', style: TextStyle(color: kAccent)),
           ),
         ],
       ),
@@ -172,24 +170,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF252525),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Reset Event', style: TextStyle(color: Colors.white)),
-        content: Text(
+        backgroundColor: kCardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(kCardRadius),
+        ),
+        title: const Text('Reset Event', style: TextStyle(color: kTextPrimary)),
+        content: const Text(
           'This will reset the timer to zero. Your streak history will be saved.',
-          style: TextStyle(color: Colors.grey[300]),
+          style: TextStyle(color: kTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('CANCEL', style: TextStyle(color: Colors.grey[400])),
+            child: const Text('CANCEL', style: TextStyle(color: kTextTertiary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'RESET',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
+            child: const Text('RESET', style: TextStyle(color: kDanger)),
           ),
         ],
       ),
@@ -225,7 +222,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void _shareEvent() {
     final text =
         '${_event.title} — ${_elapsed.inDays} days and counting! #Elapsed';
-    Share.share(text);
+    SharePlus.instance.share(ShareParams(text: text));
   }
 
   // ── UI ───────────────────────────────────────────────────
@@ -243,11 +240,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: kBgBlack,
           elevation: 0,
           title: Text(
             _event.title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: kTextPrimary,
+            ),
           ),
           actions: [
             IconButton(
@@ -265,7 +266,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
 
               // ── Hero card ──
               _buildHeroCard(elapsed),
@@ -278,23 +279,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ? _buildGoalProgress()
                     : SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
+                        child: OutlinedButton(
                           onPressed: _setGoal,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2A2A2A),
-                            foregroundColor: Colors.white,
-                            elevation: 0,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: kTextSecondary,
+                            side: const BorderSide(color: kDivider),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(kCardRadius),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text(
                             'SET GOAL',
                             style: TextStyle(
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               letterSpacing: 1.5,
-                              fontSize: 14,
+                              fontSize: 13,
                             ),
                           ),
                         ),
@@ -312,12 +312,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(10),
+                    color: kCardDarkAlt,
+                    borderRadius: BorderRadius.circular(kCardRadius),
                   ),
                   child: Text(
                     'Started on: ${_formatStartDate(_event.startDateTime)}',
-                    style: TextStyle(color: Colors.grey[300], fontSize: 14),
+                    style: const TextStyle(color: kTextSecondary, fontSize: 14),
                   ),
                 ),
               ),
@@ -330,24 +330,24 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
-                    borderRadius: BorderRadius.circular(14),
+                    color: kCardDark,
+                    borderRadius: BorderRadius.circular(kCardRadius),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.trending_up_rounded,
-                            color: _accentColor,
-                            size: 22,
+                            color: kAccent,
+                            size: 20,
                           ),
                           const SizedBox(width: 8),
-                          Text(
+                          const Text(
                             'Longest Streak',
                             style: TextStyle(
-                              color: Colors.grey[400],
+                              color: kTextTertiary,
                               fontSize: 13,
                             ),
                           ),
@@ -356,10 +356,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       const SizedBox(height: 8),
                       Text(
                         '$_longestStreakDays days',
-                        style: TextStyle(
-                          color: _accentColor,
+                        style: const TextStyle(
+                          color: kAccent,
                           fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -371,24 +371,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               // ── Reset button ──
               SizedBox(
                 width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
+                height: 48,
+                child: OutlinedButton(
                   onPressed: _resetEvent,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFFEF4444,
-                    ).withValues(alpha: 0.15),
-                    foregroundColor: const Color(0xFFEF4444),
-                    elevation: 0,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: kDanger,
+                    side: BorderSide(color: kDanger.withValues(alpha: 0.4)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(kCardRadius),
                     ),
                   ),
                   child: const Text(
                     'RESET EVENT',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -405,40 +402,41 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget _buildHeroCard(Duration elapsed) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(16),
-        border: Border(top: BorderSide(color: _accentColor, width: 3)),
+        color: kCardDark,
+        borderRadius: BorderRadius.circular(kCardRadius),
       ),
       child: Column(
         children: [
           Text(
             _event.title,
             style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+              color: kTextSecondary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             _formattedElapsed(elapsed),
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey[300],
-              fontSize: 22,
-              fontWeight: FontWeight.w500,
+            style: const TextStyle(
+              color: kTextPrimary,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
+
+          // Subtle divider
           Container(
-            width: 40,
-            height: 3,
+            width: 32,
+            height: 2,
             decoration: BoxDecoration(
-              color: _accentColor,
-              borderRadius: BorderRadius.circular(2),
+              color: kAccent.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(1),
             ),
           ),
           const SizedBox(height: 20),
@@ -453,8 +451,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           Text(
             _fullElapsed(elapsed),
             style: TextStyle(
-              color: _accentColor,
-              fontSize: 13,
+              color: kAccent.withValues(alpha: 0.7),
+              fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -475,20 +473,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             label: Text(
               f,
               style: TextStyle(
-                color: selected ? Colors.white : Colors.grey[400],
-                fontSize: 13,
+                color: selected ? kTextPrimary : kTextTertiary,
+                fontSize: 12,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
             selected: selected,
             onSelected: (_) => setState(() => _selectedFormat = f),
-            selectedColor: const Color(0xFF7C3AED).withValues(alpha: 0.35),
-            backgroundColor: const Color(0xFF2A2A2A),
+            selectedColor: kAccent.withValues(alpha: 0.2),
+            backgroundColor: kCardDarkAlt,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: BorderSide(
-                color: selected ? const Color(0xFF7C3AED) : Colors.grey[700]!,
-              ),
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: selected ? kAccent : kDivider),
             ),
             showCheckmark: false,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -510,12 +506,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           children: [
             Text(
               '${_elapsed.inDays} / ${_event.goalDays} days',
-              style: const TextStyle(color: Colors.white, fontSize: 15),
+              style: const TextStyle(color: kTextPrimary, fontSize: 15),
             ),
             Text(
               '${(clamped * 100).toInt()}%',
-              style: TextStyle(
-                color: _accentColor,
+              style: const TextStyle(
+                color: kAccent,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -524,12 +520,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ),
         const SizedBox(height: 10),
         ClipRRect(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: clamped,
-            minHeight: 8,
-            backgroundColor: const Color(0xFF2A2A2A),
-            valueColor: AlwaysStoppedAnimation<Color>(_accentColor),
+            minHeight: 6,
+            backgroundColor: kCardDarkAlt,
+            valueColor: const AlwaysStoppedAnimation<Color>(kAccent),
           ),
         ),
         const SizedBox(height: 8),
@@ -537,10 +533,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           alignment: Alignment.centerRight,
           child: GestureDetector(
             onTap: _setGoal,
-            child: Text(
+            child: const Text(
               'Change goal',
               style: TextStyle(
-                color: Colors.grey[500],
+                color: kTextTertiary,
                 fontSize: 12,
                 decoration: TextDecoration.underline,
               ),
@@ -556,8 +552,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(14),
+        color: kCardDark,
+        borderRadius: BorderRadius.circular(kCardRadius),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -575,8 +571,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: TextStyle(
-        color: Colors.grey[500],
+      style: const TextStyle(
+        color: kTextTertiary,
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 1.5,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/event_model.dart';
 import '../services/storage_service.dart';
 import '../services/widget_service.dart';
+import '../theme.dart';
 import '../widgets/event_card.dart';
 import 'add_event_screen.dart';
 import 'event_detail_screen.dart';
@@ -42,27 +43,26 @@ class _HomeScreenState extends State<HomeScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF252525),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: kCardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(kCardRadius),
+        ),
         title: const Text(
           'Delete Event',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: kTextPrimary),
         ),
         content: Text(
           'Remove "${_events[index].title}"?',
-          style: TextStyle(color: Colors.grey[300]),
+          style: const TextStyle(color: kTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('CANCEL', style: TextStyle(color: Colors.grey[400])),
+            child: const Text('CANCEL', style: TextStyle(color: kTextTertiary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'DELETE',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
+            child: const Text('DELETE', style: TextStyle(color: kDanger)),
           ),
         ],
       ),
@@ -101,50 +101,44 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Header
             const Padding(
-              padding: EdgeInsets.fromLTRB(20, 24, 20, 4),
+              padding: EdgeInsets.fromLTRB(20, 32, 20, 4),
               child: Text(
                 'Elapsed',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
+                  color: kTextPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.3,
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 24),
               child: Text(
                 'Track your progress',
-                style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                style: TextStyle(color: kTextTertiary, fontSize: 13),
               ),
             ),
 
             // Event list
             Expanded(
               child: _events.isEmpty
-                  ? Center(
+                  ? const Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.timer_outlined,
-                            size: 64,
-                            color: Colors.grey[700],
-                          ),
-                          const SizedBox(height: 16),
                           Text(
                             'No events yet',
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color: kTextSecondary,
                               fontSize: 16,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text(
                             'Tap the button below to get started',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: kTextTertiary,
                               fontSize: 13,
                             ),
                           ),
@@ -170,24 +164,28 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // Add Event button
+      // Add Event button — subtle outline
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: SizedBox(
-          height: 48,
+          height: 44,
           child: FloatingActionButton.extended(
             onPressed: _navigateToAdd,
-            backgroundColor: const Color(0xFF7C3AED),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            highlightElevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(22),
+              side: const BorderSide(color: kAccent, width: 1),
             ),
-            icon: const Icon(Icons.add, color: Colors.white),
+            icon: const Icon(Icons.add, color: kAccent, size: 20),
             label: const Text(
               'ADD EVENT',
               style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1,
+                color: kAccent,
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+                letterSpacing: 0.8,
               ),
             ),
           ),

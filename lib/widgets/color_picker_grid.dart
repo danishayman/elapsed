@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme.dart';
 
 class ColorPickerGrid extends StatelessWidget {
   final List<String> colors;
@@ -38,20 +39,11 @@ class ColorPickerGrid extends StatelessWidget {
               color: color,
               shape: BoxShape.circle,
               border: isSelected
-                  ? Border.all(color: Colors.white, width: 2.5)
-                  : null,
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.5),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ]
+                  ? Border.all(color: kTextPrimary, width: 2)
                   : null,
             ),
             child: isSelected
-                ? const Icon(Icons.check, color: Colors.white, size: 20)
+                ? const Icon(Icons.check, color: kTextPrimary, size: 18)
                 : null,
           ),
         );
