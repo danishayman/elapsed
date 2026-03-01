@@ -125,7 +125,7 @@ struct MediumWidgetView: View {
             Color(red: 0.12, green: 0.12, blue: 0.12)
 
             VStack(alignment: .leading, spacing: 0) {
-                Text("Time Since")
+                Text("Elapsed")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
                     .padding(.bottom, 8)
@@ -226,7 +226,7 @@ struct SmallTimeSinceWidget: Widget {
         StaticConfiguration(kind: kind, provider: TimeSinceProvider()) { entry in
             SmallWidgetView(entry: entry)
         }
-        .configurationDisplayName("Time Since – Small")
+        .configurationDisplayName("Elapsed – Small")
         .description("Shows your most recent event countdown.")
         .supportedFamilies([.systemSmall])
     }
@@ -239,7 +239,7 @@ struct MediumTimeSinceWidget: Widget {
         StaticConfiguration(kind: kind, provider: TimeSinceProvider()) { entry in
             MediumWidgetView(entry: entry)
         }
-        .configurationDisplayName("Time Since – Medium")
+        .configurationDisplayName("Elapsed – Medium")
         .description("Shows up to 3 event countdowns.")
         .supportedFamilies([.systemMedium])
     }
@@ -252,7 +252,7 @@ struct LargeTimeSinceWidget: Widget {
         StaticConfiguration(kind: kind, provider: TimeSinceProvider()) { entry in
             LargeWidgetView(entry: entry)
         }
-        .configurationDisplayName("Time Since – Large")
+        .configurationDisplayName("Elapsed – Large")
         .description("Shows a featured event with a large day count.")
         .supportedFamilies([.systemLarge])
     }

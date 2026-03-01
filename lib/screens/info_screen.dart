@@ -49,7 +49,7 @@ class InfoScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 14),
                         const Text(
-                          'Time Since',
+                          'Elapsed',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -60,7 +60,7 @@ class InfoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Time Since helps you track how long it has been since '
+                      'Elapsed helps you track how long it has been since '
                       'important personal events. Whether you\'re counting days '
                       'smoke-free, tracking your gym streak, or remembering '
                       'milestones — this app keeps a live, real-time counter for '

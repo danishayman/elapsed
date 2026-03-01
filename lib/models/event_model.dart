@@ -5,19 +5,42 @@ class EventModel {
   final String title;
   final DateTime startDateTime;
   final String colorHex;
+  final int? goalDays;
+  final List<DateTime> resetHistory;
 
   EventModel({
     required this.id,
     required this.title,
     required this.startDateTime,
     required this.colorHex,
-  });
+    this.goalDays,
+    List<DateTime>? resetHistory,
+  }) : resetHistory = resetHistory ?? [];
+
+  EventModel copyWith({
+    String? id,
+    String? title,
+    DateTime? startDateTime,
+    String? colorHex,
+    int? goalDays,
+    bool clearGoal = false,
+    List<DateTime>? resetHistory,
+  }) => EventModel(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    startDateTime: startDateTime ?? this.startDateTime,
+    colorHex: colorHex ?? this.colorHex,
+    goalDays: clearGoal ? null : (goalDays ?? this.goalDays),
+    resetHistory: resetHistory ?? this.resetHistory,
+  );
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
     'startDateTime': startDateTime.toIso8601String(),
     'colorHex': colorHex,
+    if (goalDays != null) 'goalDays': goalDays,
+    'resetHistory': resetHistory.map((d) => d.toIso8601String()).toList(),
   };
 
   factory EventModel.fromJson(Map<String, dynamic> json) => EventModel(
@@ -25,6 +48,12 @@ class EventModel {
     title: json['title'] as String,
     startDateTime: DateTime.parse(json['startDateTime'] as String),
     colorHex: json['colorHex'] as String,
+    goalDays: json['goalDays'] as int?,
+    resetHistory:
+        (json['resetHistory'] as List<dynamic>?)
+            ?.map((e) => DateTime.parse(e as String))
+            .toList() ??
+        [],
   );
 
   static String encodeList(List<EventModel> events) =>

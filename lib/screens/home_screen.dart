@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const Padding(
               padding: EdgeInsets.fromLTRB(20, 24, 20, 4),
               child: Text(
-                'Time Since',
+                'Elapsed',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 28,
