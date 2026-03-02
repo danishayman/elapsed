@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Color
 import android.widget.RemoteViews
 import org.json.JSONArray
+import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -38,8 +39,9 @@ class TimeSinceLargeWidgetProvider : AppWidgetProvider() {
 
                 if (json != null) {
                     val events = JSONArray(json)
-                    if (events.length() > 0) {
-                        val event = events.getJSONObject(0)
+                    val event = findEventForWidget(prefs, appWidgetId, events)
+
+                    if (event != null) {
                         val title = event.getString("title")
                         val startStr = event.getString("startDateTime")
                         val colorHex = event.optString("colorHex", "#7C3AED")
@@ -64,6 +66,11 @@ class TimeSinceLargeWidgetProvider : AppWidgetProvider() {
 
                         val color = Color.parseColor(colorHex)
                         views.setInt(R.id.accent_bar, "setBackgroundColor", color)
+                    } else {
+                        views.setTextViewText(R.id.event_title, "No event selected")
+                        views.setTextViewText(R.id.days_count, "—")
+                        views.setTextViewText(R.id.days_label, "")
+                        views.setTextViewText(R.id.event_subtitle, "Add events in the app")
                     }
                 }
             } catch (e: Exception) {
@@ -74,6 +81,24 @@ class TimeSinceLargeWidgetProvider : AppWidgetProvider() {
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+
+        private fun findEventForWidget(
+            prefs: android.content.SharedPreferences,
+            appWidgetId: Int,
+            events: JSONArray
+        ): JSONObject? {
+            val savedId = prefs.getString("widget_${appWidgetId}_event_id", null)
+            if (savedId != null) {
+                for (i in 0 until events.length()) {
+                    val event = events.getJSONObject(i)
+                    if (event.getString("id") == savedId) {
+                        return event
+                    }
+                }
+            }
+            // Fallback: show first event if no selection saved
+            return if (events.length() > 0) events.getJSONObject(0) else null
         }
     }
 }
