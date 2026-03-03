@@ -68,7 +68,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     });
   }
 
-  Future<void> _pickDate() async {
+  Future<void> _pickDateTime() async {
     final date = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
@@ -81,10 +81,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
         child: child!,
       ),
     );
-    if (date != null) setState(() => _selectedDate = date);
-  }
+    if (date == null) return;
+    setState(() => _selectedDate = date);
 
-  Future<void> _pickTime() async {
+    if (!mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: _selectedTime ?? TimeOfDay.now(),
@@ -238,9 +238,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
             const SizedBox(height: 32),
 
-            // ── Countdown until ──
+            // ── Event date & time ──
             const Text(
-              'Countdown until',
+              'Event date & time',
               style: TextStyle(
                 color: kTextPrimary,
                 fontSize: 16,
@@ -248,25 +248,40 @@ class _AddEventScreenState extends State<AddEventScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _CountdownOption(
-                  icon: Icons.calendar_today_outlined,
-                  label: _selectedDate != null
-                      ? _formatDate(_selectedDate!)
-                      : 'Calendar',
-                  onTap: _pickDate,
+            GestureDetector(
+              onTap: _pickDateTime,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
                 ),
-                const SizedBox(width: 40),
-                _CountdownOption(
-                  icon: Icons.access_time_outlined,
-                  label: _selectedTime != null
-                      ? _formatTime(_selectedTime!)
-                      : 'Time',
-                  onTap: _pickTime,
+                decoration: BoxDecoration(
+                  border: Border.all(color: kDivider, width: 1.5),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.event_outlined,
+                      size: 22,
+                      color: kTextSecondary,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      _selectedDate != null && _selectedTime != null
+                          ? '${_formatDate(_selectedDate!)}  •  ${_formatTime(_selectedTime!)}'
+                          : 'Select date & time',
+                      style: TextStyle(
+                        color: _selectedDate != null
+                            ? kTextPrimary
+                            : kTextTertiary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 24),
@@ -288,43 +303,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
             const SizedBox(height: 24),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CountdownOption extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _CountdownOption({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              border: Border.all(color: kDivider, width: 1.5),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(icon, size: 28, color: kTextSecondary),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(color: kTextSecondary, fontSize: 13),
-          ),
-        ],
       ),
     );
   }
