@@ -125,11 +125,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: _events.length,
                 onReorder: _onReorder,
                 proxyDecorator: (child, index, animation) {
-                  return Material(
-                    elevation: 4,
-                    color: kBgWhite,
-                    shadowColor: Colors.black26,
-                    child: child,
+                  return Opacity(
+                    opacity: 0.4,
+                    child: Material(
+                      elevation: 4,
+                      color: kBgWhite,
+                      shadowColor: Colors.black26,
+                      child: child,
+                    ),
                   );
                 },
                 itemBuilder: (context, index) {
