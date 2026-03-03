@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-// ── Ultra Minimal Design Tokens ──────────────────────────────
+// ── Light Minimal Design Tokens ──────────────────────────────
 
-const Color kBgBlack = Color(0xFF000000);
-const Color kCardDark = Color(0xFF111111);
-const Color kCardDarkAlt = Color(0xFF1A1A1A);
-const Color kAccent = Color(0xFF4DA3FF);
-const Color kTextPrimary = Color(0xFFFFFFFF);
-const Color kTextSecondary = Color(0xB3FFFFFF); // ~70% white
-const Color kTextTertiary = Color(0x61FFFFFF); // ~38% white
-const Color kDivider = Color(0x1AFFFFFF); // ~10% white
+const Color kBgWhite = Color(0xFFFFFFFF);
+const Color kCardLight = Color(0xFFFFFFFF);
+const Color kCardLightAlt = Color(0xFFF5F5F5);
+const Color kAccent = Color(0xFF0097A7); // Teal accent
+const Color kAccentWarm = Color(0xFFE8A030); // Warm orange for secondary badges
+const Color kTextPrimary = Color(0xFF212121);
+const Color kTextSecondary = Color(0xB3212121); // ~70% black
+const Color kTextTertiary = Color(0x61212121); // ~38% black
+const Color kDivider = Color(0x1F000000); // ~12% black
 const Color kDanger = Color(0xFFEF4444);
 
 const double kCardRadius = 10.0;
@@ -17,12 +18,13 @@ const double kCardRadius = 10.0;
 // ── ThemeData ────────────────────────────────────────────────
 
 ThemeData buildAppTheme() {
-  return ThemeData.dark().copyWith(
-    scaffoldBackgroundColor: kBgBlack,
-    colorScheme: const ColorScheme.dark(primary: kAccent, surface: kBgBlack),
+  return ThemeData.light().copyWith(
+    scaffoldBackgroundColor: kBgWhite,
+    colorScheme: const ColorScheme.light(primary: kAccent, surface: kBgWhite),
     appBarTheme: const AppBarTheme(
-      backgroundColor: kBgBlack,
+      backgroundColor: kBgWhite,
       elevation: 0,
+      scrolledUnderElevation: 0,
       titleTextStyle: TextStyle(
         color: kTextPrimary,
         fontSize: 18,
@@ -31,14 +33,14 @@ ThemeData buildAppTheme() {
       iconTheme: IconThemeData(color: kTextPrimary),
     ),
     dialogTheme: DialogThemeData(
-      backgroundColor: kCardDark,
+      backgroundColor: kBgWhite,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(kCardRadius),
       ),
     ),
     snackBarTheme: const SnackBarThemeData(
-      backgroundColor: kCardDark,
-      contentTextStyle: TextStyle(color: kTextPrimary),
+      backgroundColor: kTextPrimary,
+      contentTextStyle: TextStyle(color: kBgWhite),
     ),
   );
 }

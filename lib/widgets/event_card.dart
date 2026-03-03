@@ -7,7 +7,7 @@ Color _parseHex(String hex) {
   return Color(int.parse('FF$buffer', radix: 16));
 }
 
-class EventCard extends StatefulWidget {
+class EventCard extends StatelessWidget {
   final EventModel event;
   final Duration elapsed;
   final VoidCallback onTap;
@@ -21,109 +21,80 @@ class EventCard extends StatefulWidget {
     required this.onLongPress,
   });
 
-  @override
-  State<EventCard> createState() => _EventCardState();
-}
+  String _formatElapsed() {
+    final days = elapsed.inDays;
+    final hours = elapsed.inHours % 24;
+    final minutes = elapsed.inMinutes % 60;
+    final seconds = elapsed.inSeconds % 60;
 
-class _EventCardState extends State<EventCard> {
-  bool _pressed = false;
+    final hh = hours.toString().padLeft(2, '0');
+    final mm = minutes.toString().padLeft(2, '0');
+    final ss = seconds.toString().padLeft(2, '0');
+
+    if (days > 0) {
+      return '${days}d $hh:$mm:$ss';
+    }
+    return '$hh:$mm:$ss';
+  }
 
   @override
   Widget build(BuildContext context) {
-    final days = widget.elapsed.inDays;
-    final hours = widget.elapsed.inHours % 24;
-    final minutes = widget.elapsed.inMinutes % 60;
-    final seconds = widget.elapsed.inSeconds % 60;
-    final eventColor = _parseHex(widget.event.colorHex);
+    final eventColor = _parseHex(event.colorHex);
 
-    return GestureDetector(
-      onTap: widget.onTap,
-      onLongPress: widget.onLongPress,
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.98 : 1.0,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOut,
-        child: AnimatedOpacity(
-          opacity: _pressed ? 0.95 : 1.0,
-          duration: const Duration(milliseconds: 120),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: kCardDark,
-              borderRadius: BorderRadius.circular(kCardRadius),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(kCardRadius),
-              child: IntrinsicHeight(
-                child: Row(
-                  children: [
-                    // Left color bar
-                    Container(width: 4, color: eventColor),
+    return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            child: Row(
+              children: [
+                // Drag handle icon
+                const Icon(Icons.drag_handle, color: kTextTertiary, size: 22),
+                const SizedBox(width: 12),
 
-                    // Card content
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 24,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.event.title.toUpperCase(),
-                              style: const TextStyle(
-                                color: kTextSecondary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '$days',
-                              style: TextStyle(
-                                color: eventColor,
-                                fontSize: 64,
-                                fontWeight: FontWeight.w700,
-                                height: 1.0,
-                                fontFeatures: const [
-                                  FontFeature.tabularFigures(),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'days',
-                              style: TextStyle(
-                                color: kTextTertiary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '${hours}h  ${minutes}m  ${seconds}s',
-                              style: const TextStyle(
-                                color: Color(0xCCFFFFFF), // ~80% white
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                fontFeatures: [FontFeature.tabularFigures()],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                // Colored time badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: eventColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    _formatElapsed(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      fontFeatures: [FontFeature.tabularFigures()],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(width: 14),
+
+                // Event title
+                Expanded(
+                  child: Text(
+                    event.title,
+                    style: const TextStyle(
+                      color: kTextPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+
+          // Thin divider
+          const Divider(height: 1, thickness: 0.5, color: kDivider),
+        ],
       ),
     );
   }

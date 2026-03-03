@@ -43,10 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: kCardDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(kCardRadius),
-        ),
         title: const Text(
           'Delete Event',
           style: TextStyle(color: kTextPrimary),
@@ -95,103 +91,50 @@ class _HomeScreenState extends State<HomeScreen> {
     final now = DateTime.now();
 
     return Scaffold(
+      backgroundColor: kBgWhite,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 32, 20, 4),
-              child: Text(
-                'Elapsed',
-                style: TextStyle(
-                  color: kTextPrimary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: -0.3,
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 24),
-              child: Text(
-                'Track your progress',
-                style: TextStyle(color: kTextTertiary, fontSize: 13),
-              ),
-            ),
-
-            // Event list
-            Expanded(
-              child: _events.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'No events yet',
-                            style: TextStyle(
-                              color: kTextSecondary,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            'Tap the button below to get started',
-                            style: TextStyle(
-                              color: kTextTertiary,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      itemCount: _events.length,
-                      itemBuilder: (context, index) {
-                        final event = _events[index];
-                        final elapsed = now.difference(event.startDateTime);
-                        return EventCard(
-                          event: event,
-                          elapsed: elapsed,
-                          onTap: () => _navigateToDetail(event),
-                          onLongPress: () => _deleteEvent(index),
-                        );
-                      },
+        child: _events.isEmpty
+            ? const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'No events yet',
+                      style: TextStyle(color: kTextSecondary, fontSize: 16),
                     ),
-            ),
-          ],
-        ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Tap + to get started',
+                      style: TextStyle(color: kTextTertiary, fontSize: 13),
+                    ),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 8, bottom: 80),
+                itemCount: _events.length,
+                itemBuilder: (context, index) {
+                  final event = _events[index];
+                  final elapsed = now.difference(event.startDateTime);
+                  return EventCard(
+                    event: event,
+                    elapsed: elapsed,
+                    onTap: () => _navigateToDetail(event),
+                    onLongPress: () => _deleteEvent(index),
+                  );
+                },
+              ),
       ),
 
-      // Add Event button — subtle outline
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: SizedBox(
-          height: 44,
-          child: FloatingActionButton.extended(
-            onPressed: _navigateToAdd,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            highlightElevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22),
-              side: const BorderSide(color: kAccent, width: 1),
-            ),
-            icon: const Icon(Icons.add, color: kAccent, size: 20),
-            label: const Text(
-              'ADD EVENT',
-              style: TextStyle(
-                color: kAccent,
-                fontWeight: FontWeight.w500,
-                fontSize: 13,
-                letterSpacing: 0.8,
-              ),
-            ),
-          ),
-        ),
+      // Black circular FAB with white +
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToAdd,
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, size: 28),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

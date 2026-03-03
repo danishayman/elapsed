@@ -26,7 +26,7 @@ class InfoScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: kCardDark,
+                  color: kCardLightAlt,
                   borderRadius: BorderRadius.circular(kCardRadius),
                 ),
                 child: Column(
@@ -73,7 +73,7 @@ class InfoScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     const _InfoTile(
                       icon: Icons.add_circle_outline,
-                      text: 'Tap "+ ADD EVENT" to create a new tracker',
+                      text: 'Tap "+" to create a new tracker',
                     ),
                     const _InfoTile(
                       icon: Icons.palette_outlined,

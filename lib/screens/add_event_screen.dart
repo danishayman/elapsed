@@ -71,8 +71,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(primary: kAccent),
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(primary: kAccent),
         ),
         child: child!,
       ),
@@ -85,8 +85,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
       context: context,
       initialTime: _selectedTime ?? TimeOfDay.now(),
       builder: (context, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(primary: kAccent),
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(primary: kAccent),
         ),
         child: child!,
       ),
@@ -153,8 +153,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.editEvent != null ? 'Edit Event' : 'Add New Event'),
-        backgroundColor: kBgBlack,
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -174,7 +172,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                 hintText: 'e.g. No smoking',
                 hintStyle: const TextStyle(color: kTextTertiary),
                 filled: true,
-                fillColor: kCardDark,
+                fillColor: kCardLightAlt,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(kCardRadius),
                   borderSide: BorderSide.none,
@@ -275,14 +273,15 @@ class _AddEventScreenState extends State<AddEventScreen> {
             SizedBox(
               width: double.infinity,
               height: 48,
-              child: OutlinedButton(
+              child: ElevatedButton(
                 onPressed: _save,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: kAccent,
-                  side: const BorderSide(color: kAccent),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kAccent,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(kCardRadius),
                   ),
+                  elevation: 0,
                 ),
                 child: const Text(
                   'SAVE EVENT',

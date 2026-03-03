@@ -90,7 +90,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   int get _longestStreakDays {
-    // Build list of start points from all resets + original start
     final starts = <DateTime>[_event.startDateTime, ..._event.resetHistory];
     starts.sort();
 
@@ -126,10 +125,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final result = await showDialog<int>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: kCardDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(kCardRadius),
-        ),
         title: const Text('Set Goal', style: TextStyle(color: kTextPrimary)),
         content: TextField(
           controller: controller,
@@ -139,7 +134,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             hintText: 'Number of days',
             hintStyle: const TextStyle(color: kTextTertiary),
             filled: true,
-            fillColor: kCardDarkAlt,
+            fillColor: kCardLightAlt,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(kCardRadius),
               borderSide: BorderSide.none,
@@ -170,10 +165,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: kCardDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(kCardRadius),
-        ),
         title: const Text('Reset Event', style: TextStyle(color: kTextPrimary)),
         content: const Text(
           'This will reset the timer to zero. Your streak history will be saved.',
@@ -206,7 +197,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       MaterialPageRoute(builder: (_) => AddEventScreen(editEvent: _event)),
     );
     if (result == true) {
-      // Reload the event from storage
       final events = await StorageService.loadEvents();
       final updated = events.firstWhere(
         (e) => e.id == _event.id,
@@ -240,8 +230,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: kBgBlack,
-          elevation: 0,
           title: Text(
             _event.title,
             style: const TextStyle(
@@ -312,7 +300,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: kCardDarkAlt,
+                    color: kCardLightAlt,
                     borderRadius: BorderRadius.circular(kCardRadius),
                   ),
                   child: Text(
@@ -330,7 +318,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: kCardDark,
+                    color: kCardLightAlt,
                     borderRadius: BorderRadius.circular(kCardRadius),
                   ),
                   child: Column(
@@ -404,7 +392,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
       decoration: BoxDecoration(
-        color: kCardDark,
+        color: kCardLightAlt,
         borderRadius: BorderRadius.circular(kCardRadius),
       ),
       child: Column(
@@ -473,15 +461,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             label: Text(
               f,
               style: TextStyle(
-                color: selected ? kTextPrimary : kTextTertiary,
+                color: selected ? Colors.white : kTextTertiary,
                 fontSize: 12,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
             selected: selected,
             onSelected: (_) => setState(() => _selectedFormat = f),
-            selectedColor: kAccent.withValues(alpha: 0.2),
-            backgroundColor: kCardDarkAlt,
+            selectedColor: kAccent,
+            backgroundColor: kCardLightAlt,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(color: selected ? kAccent : kDivider),
@@ -524,7 +512,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           child: LinearProgressIndicator(
             value: clamped,
             minHeight: 6,
-            backgroundColor: kCardDarkAlt,
+            backgroundColor: kDivider,
             valueColor: const AlwaysStoppedAnimation<Color>(kAccent),
           ),
         ),
@@ -552,8 +540,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: kCardDark,
+        color: kBgWhite,
         borderRadius: BorderRadius.circular(kCardRadius),
+        border: Border.all(color: kDivider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

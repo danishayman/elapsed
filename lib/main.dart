@@ -36,7 +36,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Push initial data to widgets on launch
     WidgetService.updateWidgets();
   }
 
@@ -60,7 +59,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
-        backgroundColor: kBgBlack,
+        backgroundColor: kBgWhite,
         selectedItemColor: kAccent,
         unselectedItemColor: kTextTertiary,
         type: BottomNavigationBarType.fixed,
