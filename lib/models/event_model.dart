@@ -8,6 +8,8 @@ class EventModel {
   final int? goalDays;
   final String timeFormat;
   final List<DateTime> resetHistory;
+  final bool isStopped;
+  final int? stoppedElapsedSeconds;
 
   EventModel({
     required this.id,
@@ -17,6 +19,8 @@ class EventModel {
     this.goalDays,
     this.timeFormat = 'Days',
     List<DateTime>? resetHistory,
+    this.isStopped = false,
+    this.stoppedElapsedSeconds,
   }) : resetHistory = resetHistory ?? [];
 
   EventModel copyWith({
@@ -28,6 +32,9 @@ class EventModel {
     bool clearGoal = false,
     String? timeFormat,
     List<DateTime>? resetHistory,
+    bool? isStopped,
+    int? stoppedElapsedSeconds,
+    bool clearStoppedElapsed = false,
   }) => EventModel(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -36,6 +43,10 @@ class EventModel {
     goalDays: clearGoal ? null : (goalDays ?? this.goalDays),
     timeFormat: timeFormat ?? this.timeFormat,
     resetHistory: resetHistory ?? this.resetHistory,
+    isStopped: isStopped ?? this.isStopped,
+    stoppedElapsedSeconds: clearStoppedElapsed
+        ? null
+        : (stoppedElapsedSeconds ?? this.stoppedElapsedSeconds),
   );
 
   Map<String, dynamic> toJson() => {
@@ -46,6 +57,9 @@ class EventModel {
     if (goalDays != null) 'goalDays': goalDays,
     'timeFormat': timeFormat,
     'resetHistory': resetHistory.map((d) => d.toIso8601String()).toList(),
+    'isStopped': isStopped,
+    if (stoppedElapsedSeconds != null)
+      'stoppedElapsedSeconds': stoppedElapsedSeconds,
   };
 
   factory EventModel.fromJson(Map<String, dynamic> json) => EventModel(
@@ -60,6 +74,8 @@ class EventModel {
             ?.map((e) => DateTime.parse(e as String))
             .toList() ??
         [],
+    isStopped: json['isStopped'] as bool? ?? false,
+    stoppedElapsedSeconds: json['stoppedElapsedSeconds'] as int?,
   );
 
   static String encodeList(List<EventModel> events) =>

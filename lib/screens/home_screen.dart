@@ -176,7 +176,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       itemBuilder: (context, index) {
                         final event = _events[index];
-                        final elapsed = now.difference(event.startDateTime);
+                        final elapsed =
+                            (event.isStopped &&
+                                event.stoppedElapsedSeconds != null)
+                            ? Duration(seconds: event.stoppedElapsedSeconds!)
+                            : now.difference(event.startDateTime);
                         return EventCard(
                           key: ValueKey(event.id),
                           event: event,

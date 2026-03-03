@@ -35,6 +35,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     super.initState();
     _event = widget.event;
     _selectedFormat = _event.timeFormat;
+    // Restore persisted stopped state
+    if (_event.isStopped && _event.stoppedElapsedSeconds != null) {
+      _isPaused = true;
+      _pausedElapsed = Duration(seconds: _event.stoppedElapsedSeconds!);
+    }
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
@@ -187,36 +192,46 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       _isPaused = false;
       _pausedElapsed = null;
       await _updateEvent(
-        _event.copyWith(startDateTime: now, resetHistory: updatedHistory),
+        _event.copyWith(
+          startDateTime: now,
+          resetHistory: updatedHistory,
+          isStopped: false,
+          clearStoppedElapsed: true,
+        ),
       );
     }
   }
 
-  void _togglePause() {
-    setState(() {
-      if (_isPaused) {
-        // Resume: adjust start time so elapsed continues from paused value
-        final pausedDur = _pausedElapsed!;
-        _event = _event.copyWith(
-          startDateTime: DateTime.now().subtract(pausedDur),
-        );
+  Future<void> _togglePause() async {
+    if (_isPaused) {
+      // Resume: adjust start time so elapsed continues from paused value
+      final pausedDur = _pausedElapsed!;
+      final updated = _event.copyWith(
+        startDateTime: DateTime.now().subtract(pausedDur),
+        isStopped: false,
+        clearStoppedElapsed: true,
+      );
+      setState(() {
         _isPaused = false;
         _pausedElapsed = null;
-        _changed = true;
-      } else {
-        // Pause: freeze elapsed
-        _pausedElapsed = DateTime.now().difference(_event.startDateTime);
-        _isPaused = true;
-      }
-    });
+      });
+      await _updateEvent(updated);
+    }
   }
 
-  void _stopEvent() {
+  Future<void> _stopEvent() async {
     if (!_isPaused) {
+      final elapsed = DateTime.now().difference(_event.startDateTime);
       setState(() {
-        _pausedElapsed = DateTime.now().difference(_event.startDateTime);
+        _pausedElapsed = elapsed;
         _isPaused = true;
       });
+      await _updateEvent(
+        _event.copyWith(
+          isStopped: true,
+          stoppedElapsedSeconds: elapsed.inSeconds,
+        ),
+      );
     }
   }
 
@@ -479,16 +494,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             onTap: _restartEvent,
                           ),
                           _buildIconAction(
-                            icon: _isPaused
-                                ? Icons.play_arrow_outlined
-                                : Icons.pause_outlined,
-                            label: _isPaused ? 'Resume' : 'Pause',
+                            icon: Icons.play_arrow_outlined,
+                            label: 'Resume',
                             onTap: _togglePause,
+                            enabled: _isPaused,
                           ),
                           _buildIconAction(
                             icon: Icons.stop_outlined,
                             label: 'Stop',
                             onTap: _stopEvent,
+                            enabled: !_isPaused,
                           ),
                         ],
                       ),
@@ -583,22 +598,25 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    bool enabled = true,
   }) {
+    final color = enabled ? kTextPrimary : kTextTertiary;
+    final labelColor = enabled ? kTextSecondary : kTextTertiary;
     return Expanded(
       child: InkWell(
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 32, color: kTextPrimary),
+              Icon(icon, size: 32, color: color),
               const SizedBox(height: 8),
               Text(
                 label,
-                style: const TextStyle(
-                  color: kTextSecondary,
+                style: TextStyle(
+                  color: labelColor,
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                 ),

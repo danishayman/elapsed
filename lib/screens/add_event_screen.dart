@@ -145,7 +145,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   }
 
   String _formatDate(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
   String _formatTime(TimeOfDay t) {
     final hour = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
@@ -209,7 +209,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(kCardRadius),
-                  borderSide: const BorderSide(color: kAccent, width: 1.5),
+                  borderSide: const BorderSide(color: kTextPrimary, width: 1.5),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -247,7 +247,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   Icon(
                     Icons.calendar_month_outlined,
                     size: 48,
-                    color: _selectedDate != null ? kAccent : kTextSecondary,
+                    color: _selectedDate != null
+                        ? kTextPrimary
+                        : kTextSecondary,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -274,7 +276,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
               child: const Text(
                 'or start from now',
                 style: TextStyle(
-                  color: kTextTertiary,
+                  color: kAccent,
                   fontSize: 13,
                   decoration: TextDecoration.underline,
                   decorationColor: kTextTertiary,
