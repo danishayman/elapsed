@@ -6,6 +6,7 @@ import '../services/storage_service.dart';
 import '../services/widget_service.dart';
 import '../theme.dart';
 import 'add_event_screen.dart';
+import 'format_screen.dart';
 
 Color _parseHex(String hex) {
   final buffer = hex.replaceFirst('#', '');
@@ -33,9 +34,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void initState() {
     super.initState();
     _event = widget.event;
+    _loadFormat();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
+  }
+
+  Future<void> _loadFormat() async {
+    final format = await StorageService.loadTimeFormat();
+    if (mounted) setState(() => _selectedFormat = format);
   }
 
   @override
@@ -52,15 +59,38 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   String _compactElapsed(Duration d) {
-    final days = d.inDays;
-    final hours = d.inHours % 24;
-    final minutes = d.inMinutes % 60;
-    final seconds = d.inSeconds % 60;
-    final hh = hours.toString().padLeft(2, '0');
-    final mm = minutes.toString().padLeft(2, '0');
-    final ss = seconds.toString().padLeft(2, '0');
-    if (days > 0) return '${days}d $hh:$mm:$ss';
-    return '$hh:$mm:$ss';
+    switch (_selectedFormat) {
+      case 'Years':
+        final years = d.inDays ~/ 365;
+        final remainingDays = d.inDays % 365;
+        return '${years}y ${remainingDays}d';
+      case 'Months':
+        final months = d.inDays ~/ 30;
+        final remainingDays = d.inDays % 30;
+        return '${months}m ${remainingDays}d';
+      case 'Weeks':
+        final weeks = d.inDays ~/ 7;
+        final remainingDays = d.inDays % 7;
+        return '${weeks}w ${remainingDays}d';
+      case 'Hours, minutes and seconds':
+        final hours = d.inHours;
+        final minutes = d.inMinutes % 60;
+        final seconds = d.inSeconds % 60;
+        final hh = hours.toString().padLeft(2, '0');
+        final mm = minutes.toString().padLeft(2, '0');
+        final ss = seconds.toString().padLeft(2, '0');
+        return '$hh:$mm:$ss';
+      default: // Days
+        final days = d.inDays;
+        final hours = d.inHours % 24;
+        final minutes = d.inMinutes % 60;
+        final seconds = d.inSeconds % 60;
+        final hh = hours.toString().padLeft(2, '0');
+        final mm = minutes.toString().padLeft(2, '0');
+        final ss = seconds.toString().padLeft(2, '0');
+        if (days > 0) return '${days}d $hh:$mm:$ss';
+        return '$hh:$mm:$ss';
+    }
   }
 
   String _fullElapsed(Duration d) {
@@ -85,6 +115,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         final years = d.inDays ~/ 365;
         final remainingDays = d.inDays % 365;
         return '$years years, $remainingDays days';
+      case 'Hours, minutes and seconds':
+        final hours = d.inHours;
+        final minutes = d.inMinutes % 60;
+        final seconds = d.inSeconds % 60;
+        return '$hours hours, $minutes minutes, $seconds seconds';
       default:
         return _fullElapsed(d);
     }
@@ -247,51 +282,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     SharePlus.instance.share(ShareParams(text: text));
   }
 
-  void _showFormatPicker() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: kBgWhite,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  Future<void> _showFormatPicker() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FormatScreen(selectedFormat: _selectedFormat),
       ),
-      builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    'Time Format',
-                    style: TextStyle(
-                      color: kTextPrimary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                for (final f in ['Days', 'Weeks', 'Months', 'Years'])
-                  ListTile(
-                    leading: Icon(
-                      _selectedFormat == f
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off,
-                      color: _selectedFormat == f ? kAccent : kTextTertiary,
-                    ),
-                    title: Text(f, style: const TextStyle(color: kTextPrimary)),
-                    onTap: () {
-                      setState(() => _selectedFormat = f);
-                      Navigator.pop(ctx);
-                    },
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
     );
+    if (result != null && mounted) {
+      setState(() => _selectedFormat = result);
+      await StorageService.saveTimeFormat(result);
+    }
   }
 
   void _showRestartHistory() {
@@ -572,19 +573,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: kTextPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(child: Divider(color: kDivider)),
-        ],
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: kTextPrimary,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

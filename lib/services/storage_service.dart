@@ -15,4 +15,16 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, EventModel.encodeList(events));
   }
+
+  static const _timeFormatKey = 'elapsed_time_format';
+
+  static Future<String> loadTimeFormat() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_timeFormatKey) ?? 'Days';
+  }
+
+  static Future<void> saveTimeFormat(String format) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_timeFormatKey, format);
+  }
 }
