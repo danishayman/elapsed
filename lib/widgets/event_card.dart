@@ -10,6 +10,7 @@ Color _parseHex(String hex) {
 class EventCard extends StatelessWidget {
   final EventModel event;
   final Duration elapsed;
+  final int index;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
@@ -17,6 +18,7 @@ class EventCard extends StatelessWidget {
     super.key,
     required this.event,
     required this.elapsed,
+    required this.index,
     required this.onTap,
     required this.onLongPress,
   });
@@ -50,8 +52,15 @@ class EventCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             child: Row(
               children: [
-                // Drag handle icon
-                const Icon(Icons.drag_handle, color: kTextTertiary, size: 22),
+                // Drag handle — hold to reorder
+                ReorderableDragStartListener(
+                  index: index,
+                  child: const Icon(
+                    Icons.drag_handle,
+                    color: kTextTertiary,
+                    size: 22,
+                  ),
+                ),
                 const SizedBox(width: 12),
 
                 // Colored time badge

@@ -86,6 +86,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadEvents();
   }
 
+  Future<void> _onReorder(int oldIndex, int newIndex) async {
+    setState(() {
+      if (newIndex > oldIndex) newIndex--;
+      final item = _events.removeAt(oldIndex);
+      _events.insert(newIndex, item);
+    });
+    await StorageService.saveEvents(_events);
+    await WidgetService.updateWidgets();
+  }
+
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -110,15 +120,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               )
-            : ListView.builder(
+            : ReorderableListView.builder(
                 padding: const EdgeInsets.only(top: 8, bottom: 80),
                 itemCount: _events.length,
+                onReorder: _onReorder,
+                proxyDecorator: (child, index, animation) {
+                  return Material(
+                    elevation: 4,
+                    color: kBgWhite,
+                    shadowColor: Colors.black26,
+                    child: child,
+                  );
+                },
                 itemBuilder: (context, index) {
                   final event = _events[index];
                   final elapsed = now.difference(event.startDateTime);
                   return EventCard(
+                    key: ValueKey(event.id),
                     event: event,
                     elapsed: elapsed,
+                    index: index,
                     onTap: () => _navigateToDetail(event),
                     onLongPress: () => _deleteEvent(index),
                   );
