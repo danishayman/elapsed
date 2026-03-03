@@ -131,8 +131,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title:
-            const Text('Restart Timer', style: TextStyle(color: kTextPrimary)),
+        title: const Text(
+          'Restart Timer',
+          style: TextStyle(color: kTextPrimary),
+        ),
         content: const Text(
           'This will restart the timer from now. Your history will be saved.',
           style: TextStyle(color: kTextSecondary),
@@ -192,8 +194,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Timer',
-            style: TextStyle(color: kTextPrimary)),
+        title: const Text(
+          'Delete Timer',
+          style: TextStyle(color: kTextPrimary),
+        ),
         content: Text(
           'Remove "${_event.title}"? This cannot be undone.',
           style: const TextStyle(color: kTextSecondary),
@@ -276,8 +280,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           : Icons.radio_button_off,
                       color: _selectedFormat == f ? kAccent : kTextTertiary,
                     ),
-                    title: Text(f,
-                        style: const TextStyle(color: kTextPrimary)),
+                    title: Text(f, style: const TextStyle(color: kTextPrimary)),
                     onTap: () {
                       setState(() => _selectedFormat = f);
                       Navigator.pop(ctx);
@@ -292,10 +295,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   void _showRestartHistory() {
-    final allStarts = <DateTime>[
-      ..._event.resetHistory,
-      _event.startDateTime,
-    ];
+    final allStarts = <DateTime>[..._event.resetHistory, _event.startDateTime];
     allStarts.sort((a, b) => b.compareTo(a));
 
     showModalBottomSheet(
@@ -350,13 +350,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
                         children: [
-                          const Icon(Icons.access_time,
-                              size: 18, color: kTextTertiary),
+                          const Icon(
+                            Icons.access_time,
+                            size: 18,
+                            color: kTextTertiary,
+                          ),
                           const SizedBox(width: 10),
                           Text(
                             _formatStartDateShort(d),
                             style: const TextStyle(
-                                color: kTextSecondary, fontSize: 14),
+                              color: kTextSecondary,
+                              fontSize: 14,
+                            ),
                           ),
                         ],
                       ),
@@ -434,7 +439,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: eventColor,
                               borderRadius: BorderRadius.circular(6),
@@ -552,10 +559,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               child: Center(
                 child: Text(
                   'Started on ${_formatStartDateShort(_event.startDateTime)}',
-                  style: const TextStyle(
-                    color: kTextTertiary,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: kTextTertiary, fontSize: 14),
                 ),
               ),
             ),
