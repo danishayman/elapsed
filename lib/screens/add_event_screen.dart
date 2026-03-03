@@ -239,48 +239,30 @@ class _AddEventScreenState extends State<AddEventScreen> {
             const SizedBox(height: 32),
 
             // ── Event date & time ──
-            const Text(
-              'Event date & time',
-              style: TextStyle(
-                color: kTextPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 16),
             GestureDetector(
               onTap: _pickDateTime,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: kDivider, width: 1.5),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.event_outlined,
-                      size: 22,
-                      color: kTextSecondary,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.calendar_month_outlined,
+                    size: 48,
+                    color: _selectedDate != null ? kAccent : kTextSecondary,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _selectedDate != null && _selectedTime != null
+                        ? '${_formatDate(_selectedDate!)}  •  ${_formatTime(_selectedTime!)}'
+                        : 'Event date & time',
+                    style: TextStyle(
+                      color: _selectedDate != null
+                          ? kTextPrimary
+                          : kTextSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      _selectedDate != null && _selectedTime != null
-                          ? '${_formatDate(_selectedDate!)}  •  ${_formatTime(_selectedTime!)}'
-                          : 'Select date & time',
-                      style: TextStyle(
-                        color: _selectedDate != null
-                            ? kTextPrimary
-                            : kTextTertiary,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
