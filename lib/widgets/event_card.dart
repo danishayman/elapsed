@@ -11,6 +11,7 @@ class EventCard extends StatelessWidget {
   final EventModel event;
   final Duration elapsed;
   final int index;
+  final String timeFormat;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
@@ -19,24 +20,44 @@ class EventCard extends StatelessWidget {
     required this.event,
     required this.elapsed,
     required this.index,
+    required this.timeFormat,
     required this.onTap,
     required this.onLongPress,
   });
 
   String _formatElapsed() {
-    final days = elapsed.inDays;
-    final hours = elapsed.inHours % 24;
-    final minutes = elapsed.inMinutes % 60;
-    final seconds = elapsed.inSeconds % 60;
-
-    final hh = hours.toString().padLeft(2, '0');
-    final mm = minutes.toString().padLeft(2, '0');
-    final ss = seconds.toString().padLeft(2, '0');
-
-    if (days > 0) {
-      return '${days}d $hh:$mm:$ss';
+    switch (timeFormat) {
+      case 'Years':
+        final years = elapsed.inDays ~/ 365;
+        final remainingDays = elapsed.inDays % 365;
+        return '${years}y ${remainingDays}d';
+      case 'Months':
+        final months = elapsed.inDays ~/ 30;
+        final remainingDays = elapsed.inDays % 30;
+        return '${months}m ${remainingDays}d';
+      case 'Weeks':
+        final weeks = elapsed.inDays ~/ 7;
+        final remainingDays = elapsed.inDays % 7;
+        return '${weeks}w ${remainingDays}d';
+      case 'Hours, minutes and seconds':
+        final hours = elapsed.inHours;
+        final minutes = elapsed.inMinutes % 60;
+        final seconds = elapsed.inSeconds % 60;
+        final hh = hours.toString().padLeft(2, '0');
+        final mm = minutes.toString().padLeft(2, '0');
+        final ss = seconds.toString().padLeft(2, '0');
+        return '$hh:$mm:$ss';
+      default: // Days
+        final days = elapsed.inDays;
+        final hours = elapsed.inHours % 24;
+        final minutes = elapsed.inMinutes % 60;
+        final seconds = elapsed.inSeconds % 60;
+        final hh = hours.toString().padLeft(2, '0');
+        final mm = minutes.toString().padLeft(2, '0');
+        final ss = seconds.toString().padLeft(2, '0');
+        if (days > 0) return '${days}d $hh:$mm:$ss';
+        return '$hh:$mm:$ss';
     }
-    return '$hh:$mm:$ss';
   }
 
   @override

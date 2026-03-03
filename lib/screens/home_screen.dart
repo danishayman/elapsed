@@ -18,15 +18,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<EventModel> _events = [];
+  String _timeFormat = 'Days';
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _loadEvents();
+    _loadTimeFormat();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
+  }
+
+  Future<void> _loadTimeFormat() async {
+    final format = await StorageService.loadTimeFormat();
+    if (mounted) setState(() => _timeFormat = format);
   }
 
   @override
@@ -77,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (_) => const AddEventScreen()),
     );
     if (result == true) _loadEvents();
+    _loadTimeFormat();
   }
 
   Future<void> _navigateToDetail(EventModel event) async {
@@ -85,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)),
     );
     _loadEvents();
+    _loadTimeFormat();
   }
 
   Future<void> _onReorder(int oldIndex, int newIndex) async {
@@ -182,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           event: event,
                           elapsed: elapsed,
                           index: index,
+                          timeFormat: _timeFormat,
                           onTap: () => _navigateToDetail(event),
                           onLongPress: () => _deleteEvent(index),
                         );
