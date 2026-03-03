@@ -6,6 +6,7 @@ class EventModel {
   final DateTime startDateTime;
   final String colorHex;
   final int? goalDays;
+  final String timeFormat;
   final List<DateTime> resetHistory;
 
   EventModel({
@@ -14,6 +15,7 @@ class EventModel {
     required this.startDateTime,
     required this.colorHex,
     this.goalDays,
+    this.timeFormat = 'Days',
     List<DateTime>? resetHistory,
   }) : resetHistory = resetHistory ?? [];
 
@@ -24,6 +26,7 @@ class EventModel {
     String? colorHex,
     int? goalDays,
     bool clearGoal = false,
+    String? timeFormat,
     List<DateTime>? resetHistory,
   }) => EventModel(
     id: id ?? this.id,
@@ -31,6 +34,7 @@ class EventModel {
     startDateTime: startDateTime ?? this.startDateTime,
     colorHex: colorHex ?? this.colorHex,
     goalDays: clearGoal ? null : (goalDays ?? this.goalDays),
+    timeFormat: timeFormat ?? this.timeFormat,
     resetHistory: resetHistory ?? this.resetHistory,
   );
 
@@ -40,6 +44,7 @@ class EventModel {
     'startDateTime': startDateTime.toIso8601String(),
     'colorHex': colorHex,
     if (goalDays != null) 'goalDays': goalDays,
+    'timeFormat': timeFormat,
     'resetHistory': resetHistory.map((d) => d.toIso8601String()).toList(),
   };
 
@@ -49,6 +54,7 @@ class EventModel {
     startDateTime: DateTime.parse(json['startDateTime'] as String),
     colorHex: json['colorHex'] as String,
     goalDays: json['goalDays'] as int?,
+    timeFormat: json['timeFormat'] as String? ?? 'Days',
     resetHistory:
         (json['resetHistory'] as List<dynamic>?)
             ?.map((e) => DateTime.parse(e as String))

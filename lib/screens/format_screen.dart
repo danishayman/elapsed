@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../services/storage_service.dart';
 import '../theme.dart';
 
 class FormatScreen extends StatefulWidget {
@@ -30,7 +29,6 @@ class _FormatScreenState extends State<FormatScreen> {
 
   void _select(String format) {
     setState(() => _selected = format);
-    StorageService.saveTimeFormat(format);
   }
 
   @override

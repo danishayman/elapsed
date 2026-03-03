@@ -25,7 +25,7 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   late EventModel _event;
   Timer? _timer;
-  String _selectedFormat = 'Days';
+  late String _selectedFormat;
   bool _changed = false;
   bool _isPaused = false;
   Duration? _pausedElapsed;
@@ -34,15 +34,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void initState() {
     super.initState();
     _event = widget.event;
-    _loadFormat();
+    _selectedFormat = _event.timeFormat;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
-  }
-
-  Future<void> _loadFormat() async {
-    final format = await StorageService.loadTimeFormat();
-    if (mounted) setState(() => _selectedFormat = format);
   }
 
   @override
@@ -291,7 +286,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
     if (result != null && mounted) {
       setState(() => _selectedFormat = result);
-      await StorageService.saveTimeFormat(result);
+      await _updateEvent(_event.copyWith(timeFormat: result));
     }
   }
 
