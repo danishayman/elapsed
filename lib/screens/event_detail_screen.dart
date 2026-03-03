@@ -7,6 +7,11 @@ import '../services/widget_service.dart';
 import '../theme.dart';
 import 'add_event_screen.dart';
 
+Color _parseHex(String hex) {
+  final buffer = hex.replaceFirst('#', '');
+  return Color(int.parse('FF$buffer', radix: 16));
+}
+
 class EventDetailScreen extends StatefulWidget {
   final EventModel event;
 
@@ -21,6 +26,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Timer? _timer;
   String _selectedFormat = 'Days';
   bool _changed = false;
+  bool _isPaused = false;
+  Duration? _pausedElapsed;
 
   @override
   void initState() {
@@ -39,7 +46,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   // ── Helpers ──────────────────────────────────────────────
 
-  Duration get _elapsed => DateTime.now().difference(_event.startDateTime);
+  Duration get _elapsed {
+    if (_isPaused && _pausedElapsed != null) return _pausedElapsed!;
+    return DateTime.now().difference(_event.startDateTime);
+  }
+
+  String _compactElapsed(Duration d) {
+    final days = d.inDays;
+    final hours = d.inHours % 24;
+    final minutes = d.inMinutes % 60;
+    final seconds = d.inSeconds % 60;
+    final hh = hours.toString().padLeft(2, '0');
+    final mm = minutes.toString().padLeft(2, '0');
+    final ss = seconds.toString().padLeft(2, '0');
+    if (days > 0) return '${days}d $hh:$mm:$ss';
+    return '$hh:$mm:$ss';
+  }
 
   String _fullElapsed(Duration d) {
     final days = d.inDays;
@@ -68,25 +90,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
-  String _formatStartDate(DateTime d) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    final hour = d.hour > 12 ? d.hour - 12 : (d.hour == 0 ? 12 : d.hour);
-    final period = d.hour >= 12 ? 'PM' : 'AM';
+  String _formatStartDateShort(DateTime d) {
+    final day = d.day.toString().padLeft(2, '0');
+    final month = d.month.toString().padLeft(2, '0');
+    final hour = d.hour.toString().padLeft(2, '0');
     final minute = d.minute.toString().padLeft(2, '0');
-    return '${months[d.month - 1]} ${d.day}, ${d.year} at $hour:$minute $period';
+    return '$day/$month/${d.year} $hour:$minute';
   }
 
   int get _longestStreakDays {
@@ -118,56 +127,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
-  Future<void> _setGoal() async {
-    final controller = TextEditingController(
-      text: _event.goalDays?.toString() ?? '',
-    );
-    final result = await showDialog<int>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Set Goal', style: TextStyle(color: kTextPrimary)),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          style: const TextStyle(color: kTextPrimary),
-          decoration: InputDecoration(
-            hintText: 'Number of days',
-            hintStyle: const TextStyle(color: kTextTertiary),
-            filled: true,
-            fillColor: kCardLightAlt,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(kCardRadius),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL', style: TextStyle(color: kTextTertiary)),
-          ),
-          TextButton(
-            onPressed: () {
-              final val = int.tryParse(controller.text.trim());
-              if (val != null && val > 0) Navigator.pop(ctx, val);
-            },
-            child: const Text('SET', style: TextStyle(color: kAccent)),
-          ),
-        ],
-      ),
-    );
-    if (result != null) {
-      await _updateEvent(_event.copyWith(goalDays: result));
-    }
-  }
-
-  Future<void> _resetEvent() async {
+  Future<void> _restartEvent() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Reset Event', style: TextStyle(color: kTextPrimary)),
+        title:
+            const Text('Restart Timer', style: TextStyle(color: kTextPrimary)),
         content: const Text(
-          'This will reset the timer to zero. Your streak history will be saved.',
+          'This will restart the timer from now. Your history will be saved.',
           style: TextStyle(color: kTextSecondary),
         ),
         actions: [
@@ -177,7 +144,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('RESET', style: TextStyle(color: kDanger)),
+            child: const Text('RESTART', style: TextStyle(color: kDanger)),
           ),
         ],
       ),
@@ -185,9 +152,70 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     if (confirmed == true) {
       final now = DateTime.now();
       final updatedHistory = [..._event.resetHistory, _event.startDateTime];
+      _isPaused = false;
+      _pausedElapsed = null;
       await _updateEvent(
         _event.copyWith(startDateTime: now, resetHistory: updatedHistory),
       );
+    }
+  }
+
+  void _togglePause() {
+    setState(() {
+      if (_isPaused) {
+        // Resume: adjust start time so elapsed continues from paused value
+        final pausedDur = _pausedElapsed!;
+        _event = _event.copyWith(
+          startDateTime: DateTime.now().subtract(pausedDur),
+        );
+        _isPaused = false;
+        _pausedElapsed = null;
+        _changed = true;
+      } else {
+        // Pause: freeze elapsed
+        _pausedElapsed = DateTime.now().difference(_event.startDateTime);
+        _isPaused = true;
+      }
+    });
+  }
+
+  void _stopEvent() {
+    if (!_isPaused) {
+      setState(() {
+        _pausedElapsed = DateTime.now().difference(_event.startDateTime);
+        _isPaused = true;
+      });
+    }
+  }
+
+  Future<void> _deleteEvent() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Timer',
+            style: TextStyle(color: kTextPrimary)),
+        content: Text(
+          'Remove "${_event.title}"? This cannot be undone.',
+          style: const TextStyle(color: kTextSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('CANCEL', style: TextStyle(color: kTextTertiary)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('DELETE', style: TextStyle(color: kDanger)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      final events = await StorageService.loadEvents();
+      events.removeWhere((e) => e.id == _event.id);
+      await StorageService.saveEvents(events);
+      await WidgetService.updateWidgets();
+      if (mounted) Navigator.pop(context, true);
     }
   }
 
@@ -215,11 +243,149 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     SharePlus.instance.share(ShareParams(text: text));
   }
 
+  void _showFormatPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: kBgWhite,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    'Time Format',
+                    style: TextStyle(
+                      color: kTextPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                for (final f in ['Days', 'Weeks', 'Months', 'Years'])
+                  ListTile(
+                    leading: Icon(
+                      _selectedFormat == f
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: _selectedFormat == f ? kAccent : kTextTertiary,
+                    ),
+                    title: Text(f,
+                        style: const TextStyle(color: kTextPrimary)),
+                    onTap: () {
+                      setState(() => _selectedFormat = f);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRestartHistory() {
+    final allStarts = <DateTime>[
+      ..._event.resetHistory,
+      _event.startDateTime,
+    ];
+    allStarts.sort((a, b) => b.compareTo(a));
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: kBgWhite,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    'Restart History',
+                    style: TextStyle(
+                      color: kTextPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    'Longest streak: $_longestStreakDays days',
+                    style: const TextStyle(
+                      color: kAccent,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (_event.resetHistory.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: Text(
+                        'No restarts yet',
+                        style: TextStyle(color: kTextTertiary, fontSize: 14),
+                      ),
+                    ),
+                  )
+                else
+                  ...allStarts.map(
+                    (d) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.access_time,
+                              size: 18, color: kTextTertiary),
+                          const SizedBox(width: 10),
+                          Text(
+                            _formatStartDateShort(d),
+                            style: const TextStyle(
+                                color: kTextSecondary, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showNotificationsDialog() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Notifications coming soon'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   // ── UI ───────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final elapsed = _elapsed;
+    final eventColor = _parseHex(_event.colorHex);
 
     return PopScope(
       canPop: true,
@@ -229,342 +395,223 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         }
       },
       child: Scaffold(
+        backgroundColor: kBgWhite,
         appBar: AppBar(
-          title: Text(
-            _event.title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
+          backgroundColor: kBgWhite,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: kTextPrimary),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'Timer',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
               color: kTextPrimary,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 22),
-              onPressed: _editEvent,
-            ),
-            IconButton(
-              icon: const Icon(Icons.share_outlined, size: 22),
+              icon: const Icon(Icons.share_outlined, color: kTextPrimary),
               onPressed: _shareEvent,
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
+        body: Column(
+          children: [
+            const Divider(height: 1, color: kDivider),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 28),
 
-              // ── Hero card ──
-              _buildHeroCard(elapsed),
-              const SizedBox(height: 20),
-
-              // ── Goal ──
-              _buildSection(
-                label: 'GOAL',
-                child: _event.goalDays != null
-                    ? _buildGoalProgress()
-                    : SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: _setGoal,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: kTextSecondary,
-                            side: const BorderSide(color: kDivider),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(kCardRadius),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: const Text(
-                            'SET GOAL',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 1.5,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 16),
-
-              // ── Start date ──
-              _buildSection(
-                label: 'START DATE',
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: kCardLightAlt,
-                    borderRadius: BorderRadius.circular(kCardRadius),
-                  ),
-                  child: Text(
-                    'Started on: ${_formatStartDate(_event.startDateTime)}',
-                    style: const TextStyle(color: kTextSecondary, fontSize: 14),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // ── Longest streak ──
-              _buildSection(
-                label: '',
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: kCardLightAlt,
-                    borderRadius: BorderRadius.circular(kCardRadius),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    // ── Hero: colored badge + title ──
+                    Center(
+                      child: Column(
                         children: [
-                          const Icon(
-                            Icons.trending_up_rounded,
-                            color: kAccent,
-                            size: 20,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: eventColor,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              _compactElapsed(elapsed),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Longest Streak',
-                            style: TextStyle(
-                              color: kTextTertiary,
-                              fontSize: 13,
+                          const SizedBox(height: 10),
+                          Text(
+                            _event.title,
+                            style: const TextStyle(
+                              color: kTextPrimary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '$_longestStreakDays days',
-                        style: const TextStyle(
-                          color: kAccent,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+                    ),
+                    const SizedBox(height: 28),
 
-              // ── Reset button ──
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton(
-                  onPressed: _resetEvent,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: kDanger,
-                    side: BorderSide(color: kDanger.withValues(alpha: 0.4)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(kCardRadius),
+                    // ── Actions ──
+                    _buildSectionHeader('Actions'),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          _buildIconAction(
+                            icon: Icons.restart_alt_rounded,
+                            label: 'Restart',
+                            onTap: _restartEvent,
+                          ),
+                          _buildIconAction(
+                            icon: _isPaused
+                                ? Icons.play_arrow_outlined
+                                : Icons.pause_outlined,
+                            label: _isPaused ? 'Resume' : 'Pause',
+                            onTap: _togglePause,
+                          ),
+                          _buildIconAction(
+                            icon: Icons.stop_outlined,
+                            label: 'Stop',
+                            onTap: _stopEvent,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'RESET EVENT',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.2,
+                    const SizedBox(height: 28),
+
+                    // ── Options ──
+                    _buildSectionHeader('Options'),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          _buildIconAction(
+                            icon: Icons.edit_outlined,
+                            label: 'Edit',
+                            onTap: _editEvent,
+                          ),
+                          _buildIconAction(
+                            icon: Icons.timer_outlined,
+                            label: 'Format',
+                            onTap: _showFormatPicker,
+                          ),
+                          _buildIconAction(
+                            icon: Icons.delete_outline,
+                            label: 'Delete',
+                            onTap: _deleteEvent,
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(height: 28),
+
+                    // ── Complements ──
+                    _buildSectionHeader('Complements'),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          _buildIconAction(
+                            icon: Icons.bar_chart_rounded,
+                            label: 'Restarts',
+                            onTap: _showRestartHistory,
+                          ),
+                          _buildIconAction(
+                            icon: Icons.notifications_outlined,
+                            label: 'Notifications',
+                            onTap: _showNotificationsDialog,
+                          ),
+                          const Expanded(child: SizedBox()),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Bottom: Started on ──
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24, top: 8),
+              child: Center(
+                child: Text(
+                  'Started on ${_formatStartDateShort(_event.startDateTime)}',
+                  style: const TextStyle(
+                    color: kTextTertiary,
+                    fontSize: 14,
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: kTextPrimary,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(child: Divider(color: kDivider)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 32, color: kTextPrimary),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: kTextSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeroCard(Duration elapsed) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-      decoration: BoxDecoration(
-        color: kCardLightAlt,
-        borderRadius: BorderRadius.circular(kCardRadius),
-      ),
-      child: Column(
-        children: [
-          Text(
-            _event.title,
-            style: const TextStyle(
-              color: kTextSecondary,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            _formattedElapsed(elapsed),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: kTextPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Subtle divider
-          Container(
-            width: 32,
-            height: 2,
-            decoration: BoxDecoration(
-              color: kAccent.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(1),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Time format selector
-          _buildLabel('TIME FORMAT'),
-          const SizedBox(height: 10),
-          _buildFormatChips(),
-          const SizedBox(height: 14),
-
-          // Full elapsed text
-          Text(
-            _fullElapsed(elapsed),
-            style: TextStyle(
-              color: kAccent.withValues(alpha: 0.7),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFormatChips() {
-    const formats = ['Days', 'Weeks', 'Months', 'Years'];
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: formats.map((f) {
-        final selected = _selectedFormat == f;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: ChoiceChip(
-            label: Text(
-              f,
-              style: TextStyle(
-                color: selected ? Colors.white : kTextTertiary,
-                fontSize: 12,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-            selected: selected,
-            onSelected: (_) => setState(() => _selectedFormat = f),
-            selectedColor: kAccent,
-            backgroundColor: kCardLightAlt,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: selected ? kAccent : kDivider),
-            ),
-            showCheckmark: false,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildGoalProgress() {
-    final progress = _elapsed.inDays / (_event.goalDays ?? 1);
-    final clamped = progress.clamp(0.0, 1.0);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '${_elapsed.inDays} / ${_event.goalDays} days',
-              style: const TextStyle(color: kTextPrimary, fontSize: 15),
-            ),
-            Text(
-              '${(clamped * 100).toInt()}%',
-              style: const TextStyle(
-                color: kAccent,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: clamped,
-            minHeight: 6,
-            backgroundColor: kDivider,
-            valueColor: const AlwaysStoppedAnimation<Color>(kAccent),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerRight,
-          child: GestureDetector(
-            onTap: _setGoal,
-            child: const Text(
-              'Change goal',
-              style: TextStyle(
-                color: kTextTertiary,
-                fontSize: 12,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSection({required String label, required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: kBgWhite,
-        borderRadius: BorderRadius.circular(kCardRadius),
-        border: Border.all(color: kDivider),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (label.isNotEmpty) ...[
-            _buildLabel(label),
-            const SizedBox(height: 12),
-          ],
-          child,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: kTextTertiary,
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 1.5,
       ),
     );
   }
