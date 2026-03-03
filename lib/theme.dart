@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 const Color kBgWhite = Color(0xFFFFFFFF);
 const Color kCardLight = Color(0xFFFFFFFF);
 const Color kCardLightAlt = Color(0xFFF5F5F5);
-const Color kAccent = Color(0xFF0097A7); // Teal accent
+const Color kAccent = Color.fromARGB(255, 208, 215, 216); // Teal accent
 const Color kAccentWarm = Color(0xFFE8A030); // Warm orange for secondary badges
 const Color kTextPrimary = Color(0xFF212121);
 const Color kTextSecondary = Color(0xB3212121); // ~70% black
