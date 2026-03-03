@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
-import 'screens/info_screen.dart';
 import 'services/widget_service.dart';
 import 'theme.dart';
 
@@ -28,10 +27,6 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
-  int _currentIndex = 0;
-
-  final _pages = const [HomeScreen(), InfoScreen()];
-
   @override
   void initState() {
     super.initState();
@@ -54,27 +49,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
-        backgroundColor: kBgWhite,
-        selectedItemColor: kAccent,
-        unselectedItemColor: kTextTertiary,
-        type: BottomNavigationBarType.fixed,
-        elevation: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info_outline),
-            label: 'Info',
-          ),
-        ],
-      ),
-    );
+    return const HomeScreen();
   }
 }

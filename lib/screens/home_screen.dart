@@ -7,6 +7,7 @@ import '../theme.dart';
 import '../widgets/event_card.dart';
 import 'add_event_screen.dart';
 import 'event_detail_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -103,51 +104,92 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: kBgWhite,
       body: SafeArea(
-        child: _events.isEmpty
-            ? const Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'No events yet',
-                      style: TextStyle(color: kTextSecondary, fontSize: 16),
+        child: Column(
+          children: [
+            // Header with title and settings button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Elapsed',
+                    style: TextStyle(
+                      color: kTextPrimary,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
                     ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Tap + to get started',
-                      style: TextStyle(color: kTextTertiary, fontSize: 13),
-                    ),
-                  ],
-                ),
-              )
-            : ReorderableListView.builder(
-                padding: const EdgeInsets.only(top: 8, bottom: 80),
-                itemCount: _events.length,
-                onReorder: _onReorder,
-                proxyDecorator: (child, index, animation) {
-                  return Opacity(
-                    opacity: 0.4,
-                    child: Material(
-                      elevation: 4,
-                      color: kBgWhite,
-                      shadowColor: Colors.black26,
-                      child: child,
-                    ),
-                  );
-                },
-                itemBuilder: (context, index) {
-                  final event = _events[index];
-                  final elapsed = now.difference(event.startDateTime);
-                  return EventCard(
-                    key: ValueKey(event.id),
-                    event: event,
-                    elapsed: elapsed,
-                    index: index,
-                    onTap: () => _navigateToDetail(event),
-                    onLongPress: () => _deleteEvent(index),
-                  );
-                },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.menu, color: kTextPrimary, size: 28),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
+            ),
+            // Events list
+            Expanded(
+              child: _events.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'No events yet',
+                            style: TextStyle(
+                              color: kTextSecondary,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            'Tap + to get started',
+                            style: TextStyle(
+                              color: kTextTertiary,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ReorderableListView.builder(
+                      padding: const EdgeInsets.only(top: 8, bottom: 80),
+                      itemCount: _events.length,
+                      onReorder: _onReorder,
+                      proxyDecorator: (child, index, animation) {
+                        return Opacity(
+                          opacity: 0.4,
+                          child: Material(
+                            elevation: 4,
+                            color: kBgWhite,
+                            shadowColor: Colors.black26,
+                            child: child,
+                          ),
+                        );
+                      },
+                      itemBuilder: (context, index) {
+                        final event = _events[index];
+                        final elapsed = now.difference(event.startDateTime);
+                        return EventCard(
+                          key: ValueKey(event.id),
+                          event: event,
+                          elapsed: elapsed,
+                          index: index,
+                          onTap: () => _navigateToDetail(event),
+                          onLongPress: () => _deleteEvent(index),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
 
       // Black circular FAB with white +
