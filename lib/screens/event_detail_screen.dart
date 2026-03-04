@@ -460,7 +460,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             child: Text(
                               _compactElapsed(elapsed),
                               style: TextStyle(
-                                color: eventColor.computeLuminance() > 0.5
+                                color: eventColor.computeLuminance() > 0.4
                                     ? Colors.black
                                     : Colors.white,
                                 fontSize: 20,
@@ -477,7 +477,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             style: const TextStyle(
                               color: kTextPrimary,
                               fontSize: 18,
-                              fontWeight: FontWeight.w400,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ],

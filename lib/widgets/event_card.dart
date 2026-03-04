@@ -97,7 +97,7 @@ class EventCard extends StatelessWidget {
                   child: Text(
                     _formatElapsed(),
                     style: TextStyle(
-                      color: eventColor.computeLuminance() > 0.5
+                      color: eventColor.computeLuminance() > 0.4
                           ? Colors.black
                           : Colors.white,
                       fontSize: 14,
@@ -115,7 +115,7 @@ class EventCard extends StatelessWidget {
                     style: const TextStyle(
                       color: kTextPrimary,
                       fontSize: 16,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w700,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
