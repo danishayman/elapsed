@@ -4,6 +4,7 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,13 @@ class WidgetConfigActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Light status bar with white background
+        window.statusBarColor = Color.WHITE
+        window.decorView.systemUiVisibility = (
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        )
 
         // Default result = CANCELED so backing out cancels widget placement
         setResult(RESULT_CANCELED)
@@ -40,10 +48,10 @@ class WidgetConfigActivity : Activity() {
         loadEvents()
 
         val listView = findViewById<ListView>(R.id.events_list)
-        val emptyMessage = findViewById<TextView>(R.id.empty_message)
+        val emptyState = findViewById<View>(R.id.empty_state)
 
         if (events.isEmpty()) {
-            emptyMessage.visibility = View.VISIBLE
+            emptyState.visibility = View.VISIBLE
             listView.visibility = View.GONE
             return
         }
@@ -106,13 +114,27 @@ class WidgetConfigActivity : Activity() {
 
             val event = events[position]
             val title = event.getString("title")
-            val colorHex = event.optString("colorHex", "#7C3AED")
+            val colorHex = event.optString("colorHex", "#007BFF")
 
             view.findViewById<TextView>(R.id.item_title).text = title
+
             try {
-                view.findViewById<View>(R.id.item_accent).setBackgroundColor(
-                    Color.parseColor(colorHex)
-                )
+                val accentView = view.findViewById<TextView>(R.id.item_accent)
+                val color = Color.parseColor(colorHex)
+
+                // Create a rounded badge background
+                val badge = GradientDrawable()
+                badge.shape = GradientDrawable.RECTANGLE
+                badge.cornerRadius = 6f * resources.displayMetrics.density
+                badge.setColor(color)
+                accentView.background = badge
+
+                // Determine text color based on luminance
+                val r = Color.red(color) / 255.0
+                val g = Color.green(color) / 255.0
+                val b = Color.blue(color) / 255.0
+                val luminance = 0.299 * r + 0.587 * g + 0.114 * b
+                accentView.setTextColor(if (luminance > 0.4) Color.BLACK else Color.WHITE)
             } catch (_: Exception) {}
 
             return view

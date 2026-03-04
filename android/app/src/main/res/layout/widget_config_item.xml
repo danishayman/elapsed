@@ -2,25 +2,65 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FF1E1E1E"
-    android:orientation="horizontal"
-    android:padding="16dp">
+    android:orientation="vertical"
+    android:background="#FFFFFFFF">
 
-    <View
-        android:id="@+id/item_accent"
-        android:layout_width="4dp"
-        android:layout_height="match_parent"
-        android:background="#FF7C3AED" />
-
-    <TextView
-        android:id="@+id/item_title"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_gravity="center_vertical"
-        android:paddingStart="12dp"
-        android:textColor="#FFFFFFFF"
-        android:textSize="16sp"
-        android:maxLines="1"
-        android:ellipsize="end" />
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:gravity="center_vertical">
+
+        <!-- Colored accent badge -->
+        <TextView
+            android:id="@+id/item_accent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textSize="12sp"
+            android:textColor="#FFFFFFFF"
+            android:fontFamily="sans-serif-medium"
+            android:text="\u2022"
+            android:gravity="center" />
+
+        <!-- Event title -->
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="14dp"
+            android:textColor="#FF212121"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Chevron indicator -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\u203A"
+            android:textColor="#61212121"
+            android:textSize="22sp"
+            android:paddingStart="8dp" />
+
+    </LinearLayout>
+
+    <!-- Thin divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="#1F000000" />
+
 </LinearLayout>
