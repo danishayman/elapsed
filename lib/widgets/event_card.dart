@@ -96,11 +96,13 @@ class EventCard extends StatelessWidget {
                   ),
                   child: Text(
                     _formatElapsed(),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: eventColor.computeLuminance() > 0.5
+                          ? Colors.black
+                          : Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      fontFeatures: [FontFeature.tabularFigures()],
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 ),
