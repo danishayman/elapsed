@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'models/event_model.dart';
 import 'screens/event_detail_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/storage_service.dart';
