@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import org.json.JSONArray
@@ -44,6 +45,11 @@ class WidgetConfigActivity : Activity() {
         }
 
         setContentView(R.layout.activity_widget_config)
+
+        // Close button finishes the activity (cancels widget placement)
+        findViewById<ImageView>(R.id.close_button).setOnClickListener {
+            finish()
+        }
 
         loadEvents()
 
@@ -116,25 +122,25 @@ class WidgetConfigActivity : Activity() {
             val title = event.getString("title")
             val colorHex = event.optString("colorHex", "#007BFF")
 
-            view.findViewById<TextView>(R.id.item_title).text = title
+            val badgeView = view.findViewById<TextView>(R.id.item_badge)
+            badgeView.text = title
 
             try {
-                val accentView = view.findViewById<TextView>(R.id.item_accent)
                 val color = Color.parseColor(colorHex)
 
-                // Create a rounded badge background
-                val badge = GradientDrawable()
-                badge.shape = GradientDrawable.RECTANGLE
-                badge.cornerRadius = 6f * resources.displayMetrics.density
-                badge.setColor(color)
-                accentView.background = badge
+                // Rounded pill background
+                val pill = GradientDrawable()
+                pill.shape = GradientDrawable.RECTANGLE
+                pill.cornerRadius = 24f * resources.displayMetrics.density
+                pill.setColor(color)
+                badgeView.background = pill
 
-                // Determine text color based on luminance
+                // Text color based on luminance
                 val r = Color.red(color) / 255.0
                 val g = Color.green(color) / 255.0
                 val b = Color.blue(color) / 255.0
                 val luminance = 0.299 * r + 0.587 * g + 0.114 * b
-                accentView.setTextColor(if (luminance > 0.4) Color.BLACK else Color.WHITE)
+                badgeView.setTextColor(if (luminance > 0.4) Color.BLACK else Color.WHITE)
             } catch (_: Exception) {}
 
             return view

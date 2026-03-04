@@ -1,9 +1,12 @@
 package com.example.Elapsed
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.widget.RemoteViews
 import org.json.JSONArray
 import org.json.JSONObject
@@ -44,11 +47,20 @@ class TimeSinceLargeWidgetProvider : AppWidgetProvider() {
                     if (event != null) {
                         val title = event.getString("title")
                         val startStr = event.getString("startDateTime")
-                        val colorHex = event.optString("colorHex", "#7C3AED")
+                        val colorHex = event.optString("colorHex", "#007BFF")
+                        val isStopped = event.optBoolean("isStopped", false)
+                        val stoppedSecs = if (event.has("stoppedElapsedSeconds"))
+                            event.getInt("stoppedElapsedSeconds") else null
 
-                        val start = LocalDateTime.parse(startStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                        val now = LocalDateTime.now()
-                        val totalMinutes = ChronoUnit.MINUTES.between(start, now)
+                        val elapsed = if (isStopped && stoppedSecs != null) {
+                            stoppedSecs.toLong()
+                        } else {
+                            val start = LocalDateTime.parse(startStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                            val now = LocalDateTime.now()
+                            ChronoUnit.SECONDS.between(start, now)
+                        }
+
+                        val totalMinutes = elapsed / 60
                         val days = totalMinutes / 1440
                         val hours = (totalMinutes % 1440) / 60
                         val minutes = totalMinutes % 60
@@ -64,8 +76,24 @@ class TimeSinceLargeWidgetProvider : AppWidgetProvider() {
                             "${days}d ${hours}h ${minutes}m"
                         )
 
+                        // Set entire widget background to event color
                         val color = Color.parseColor(colorHex)
-                        views.setInt(R.id.accent_bar, "setBackgroundColor", color)
+                        views.setInt(R.id.widget_root, "setBackgroundColor", color)
+
+                        // Determine text color based on luminance
+                        val r = Color.red(color) / 255.0
+                        val g = Color.green(color) / 255.0
+                        val b = Color.blue(color) / 255.0
+                        val luminance = 0.299 * r + 0.587 * g + 0.114 * b
+                        val textColor = if (luminance > 0.5) Color.BLACK else Color.WHITE
+                        val subTextColor = if (luminance > 0.5) 0xBB000000.toInt() else 0xBBFFFFFF.toInt()
+                        val labelColor = if (luminance > 0.5) 0xCC000000.toInt() else 0xCCFFFFFF.toInt()
+
+                        views.setTextColor(R.id.event_title, textColor)
+                        views.setTextColor(R.id.days_count, textColor)
+                        views.setTextColor(R.id.days_label, labelColor)
+                        views.setTextColor(R.id.event_subtitle, subTextColor)
+                        views.setInt(R.id.widget_icon, "setColorFilter", textColor)
                     } else {
                         views.setTextViewText(R.id.event_title, "No event selected")
                         views.setTextViewText(R.id.days_count, "—")
@@ -78,6 +106,29 @@ class TimeSinceLargeWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.days_count, "—")
                 views.setTextViewText(R.id.days_label, "")
                 views.setTextViewText(R.id.event_subtitle, "Add events in the app")
+            }
+
+            // Set click intent to open event details
+            val eventId = try {
+                val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
+                val json = prefs.getString("events_json", null)
+                if (json != null) {
+                    val events = JSONArray(json)
+                    findEventForWidget(prefs, appWidgetId, events)?.getString("id")
+                } else null
+            } catch (_: Exception) { null }
+
+            if (eventId != null) {
+                val intent = Intent(context, MainActivity::class.java).apply {
+                    action = Intent.ACTION_VIEW
+                    data = Uri.parse("elapsed://event/$eventId")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+                val pendingIntent = PendingIntent.getActivity(
+                    context, appWidgetId, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -97,7 +148,6 @@ class TimeSinceLargeWidgetProvider : AppWidgetProvider() {
                     }
                 }
             }
-            // Fallback: show first event if no selection saved
             return if (events.length() > 0) events.getJSONObject(0) else null
         }
     }

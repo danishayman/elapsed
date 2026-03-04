@@ -1,132 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:clipToOutline="true">
 
-    <TextView
-        android:id="@+id/header_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Elapsed"
-        android:textColor="#FFFFFFFF"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
-
-    <!-- Row 1 -->
     <LinearLayout
-        android:id="@+id/row1"
+        android:id="@+id/widget_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_marginBottom="6dp"
-        android:visibility="gone">
+        android:gravity="center_vertical"
+        android:padding="16dp">
 
         <ImageView
-            android:id="@+id/accent1"
-            android:layout_width="3dp"
-            android:layout_height="match_parent"
-            android:background="#FF7C3AED"
+            android:id="@+id/widget_icon"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@android:drawable/ic_menu_recent_history"
             android:importantForAccessibility="no" />
 
-        <TextView
-            android:id="@+id/title1"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingStart="8dp"
-            android:textColor="#FFFFFFFF"
-            android:textSize="13sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:orientation="vertical"
+            android:paddingStart="14dp">
 
-        <TextView
-            android:id="@+id/elapsed1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FF9E9E9E"
-            android:textSize="12sp" />
+            <TextView
+                android:id="@+id/event_elapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="---"
+                android:textColor="#FFFFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:maxLines="1" />
+
+            <TextView
+                android:id="@+id/event_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No events"
+                android:textColor="#DDFFFFFF"
+                android:textSize="15sp"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
     </LinearLayout>
-
-    <!-- Row 2 -->
-    <LinearLayout
-        android:id="@+id/row2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="6dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/accent2"
-            android:layout_width="3dp"
-            android:layout_height="match_parent"
-            android:background="#FF7C3AED"
-            android:importantForAccessibility="no" />
-
-        <TextView
-            android:id="@+id/title2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingStart="8dp"
-            android:textColor="#FFFFFFFF"
-            android:textSize="13sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
-
-        <TextView
-            android:id="@+id/elapsed2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FF9E9E9E"
-            android:textSize="12sp" />
-    </LinearLayout>
-
-    <!-- Row 3 -->
-    <LinearLayout
-        android:id="@+id/row3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/accent3"
-            android:layout_width="3dp"
-            android:layout_height="match_parent"
-            android:background="#FF7C3AED"
-            android:importantForAccessibility="no" />
-
-        <TextView
-            android:id="@+id/title3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingStart="8dp"
-            android:textColor="#FFFFFFFF"
-            android:textSize="13sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
-
-        <TextView
-            android:id="@+id/elapsed3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FF9E9E9E"
-            android:textSize="12sp" />
-    </LinearLayout>
-
-    <!-- Empty state -->
-    <TextView
-        android:id="@+id/empty_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No events yet"
-        android:textColor="#FF757575"
-        android:textSize="13sp"
-        android:visibility="gone" />
-</LinearLayout>
+</FrameLayout>
