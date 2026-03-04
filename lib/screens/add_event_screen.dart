@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/event_model.dart';
@@ -5,6 +7,19 @@ import '../services/storage_service.dart';
 import '../services/widget_service.dart';
 import '../theme.dart';
 import '../widgets/color_picker_grid.dart';
+
+const _defaultNames = [
+  'An unnamed timer',
+  'A mysterious countdown',
+  'Timer with no name',
+  'The nameless one',
+  'Just vibes',
+  'Something happened here',
+  'Who knows what this is',
+  'A timer of mystery',
+  'The forgotten timer',
+  'It shall not be named',
+];
 
 const _paletteColors = [
   // Row 1 – lightest
@@ -99,12 +114,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
   }
 
   Future<void> _save() async {
-    final title = _titleController.text.trim();
+    var title = _titleController.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an event title')),
-      );
-      return;
+      title = _defaultNames[Random().nextInt(_defaultNames.length)];
     }
     if (_selectedDate == null || _selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
