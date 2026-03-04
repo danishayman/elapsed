@@ -459,11 +459,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             ),
                             child: Text(
                               _compactElapsed(elapsed),
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: eventColor.computeLuminance() > 0.5
+                                    ? Colors.black
+                                    : Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w700,
-                                fontFeatures: [FontFeature.tabularFigures()],
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures(),
+                                ],
                               ),
                             ),
                           ),
