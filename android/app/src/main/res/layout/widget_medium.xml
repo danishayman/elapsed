@@ -25,11 +25,12 @@
         android:layout_marginBottom="6dp"
         android:visibility="gone">
 
-        <View
+        <ImageView
             android:id="@+id/accent1"
             android:layout_width="3dp"
             android:layout_height="match_parent"
-            android:background="#FF7C3AED" />
+            android:background="#FF7C3AED"
+            android:importantForAccessibility="no" />
 
         <TextView
             android:id="@+id/title1"
@@ -59,11 +60,12 @@
         android:layout_marginBottom="6dp"
         android:visibility="gone">
 
-        <View
+        <ImageView
             android:id="@+id/accent2"
             android:layout_width="3dp"
             android:layout_height="match_parent"
-            android:background="#FF7C3AED" />
+            android:background="#FF7C3AED"
+            android:importantForAccessibility="no" />
 
         <TextView
             android:id="@+id/title2"
@@ -92,11 +94,12 @@
         android:orientation="horizontal"
         android:visibility="gone">
 
-        <View
+        <ImageView
             android:id="@+id/accent3"
             android:layout_width="3dp"
             android:layout_height="match_parent"
-            android:background="#FF7C3AED" />
+            android:background="#FF7C3AED"
+            android:importantForAccessibility="no" />
 
         <TextView
             android:id="@+id/title3"

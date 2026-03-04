@@ -82,17 +82,16 @@ class WidgetConfigActivity : Activity() {
     }
 
     private fun updateWidgetById(appWidgetManager: AppWidgetManager, widgetId: Int) {
-        // Determine the widget provider type from the manager and update accordingly
-        // Since we don't know which size, we update all three — only the matching one takes effect
-        try {
-            TimeSinceSmallWidgetProvider.updateSmallWidget(this, appWidgetManager, widgetId)
-        } catch (_: Exception) {}
-        try {
-            TimeSinceMediumWidgetProvider.updateMediumWidget(this, appWidgetManager, widgetId)
-        } catch (_: Exception) {}
-        try {
-            TimeSinceLargeWidgetProvider.updateLargeWidget(this, appWidgetManager, widgetId)
-        } catch (_: Exception) {}
+        val info = appWidgetManager.getAppWidgetInfo(widgetId) ?: return
+        val providerName = info.provider?.className ?: return
+        when {
+            providerName.contains("Small") ->
+                TimeSinceSmallWidgetProvider.updateSmallWidget(this, appWidgetManager, widgetId)
+            providerName.contains("Medium") ->
+                TimeSinceMediumWidgetProvider.updateMediumWidget(this, appWidgetManager, widgetId)
+            providerName.contains("Large") ->
+                TimeSinceLargeWidgetProvider.updateLargeWidget(this, appWidgetManager, widgetId)
+        }
     }
 
     private inner class EventAdapter : BaseAdapter() {
