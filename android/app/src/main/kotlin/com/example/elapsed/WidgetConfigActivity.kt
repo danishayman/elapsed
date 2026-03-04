@@ -1,4 +1,4 @@
-package com.example.elapsed
+package com.example.Elapsed
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager

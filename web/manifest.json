@@ -1,6 +1,6 @@
 {
-    "name": "elapsed",
-    "short_name": "elapsed",
+    "name": "Elapsed",
+    "short_name": "Elapsed",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

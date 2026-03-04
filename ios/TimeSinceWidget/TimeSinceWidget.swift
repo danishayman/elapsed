@@ -35,7 +35,7 @@ struct TimeSinceEntry: TimelineEntry {
 
 // MARK: - Timeline Provider
 struct TimeSinceProvider: TimelineProvider {
-    private let suiteName = "group.com.example.elapsed"
+    private let suiteName = "group.com.example.Elapsed"
     private let key = "events_json"
 
     func placeholder(in context: Context) -> TimeSinceEntry {

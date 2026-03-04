@@ -204,7 +204,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _togglePause() async {
     if (_isPaused) {
-      // Resume: adjust start time so elapsed continues from paused value
+      // Resume: adjust start time so Elapsed continues from paused value
       final pausedDur = _pausedElapsed!;
       final updated = _event.copyWith(
         startDateTime: DateTime.now().subtract(pausedDur),
@@ -221,15 +221,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _stopEvent() async {
     if (!_isPaused) {
-      final elapsed = DateTime.now().difference(_event.startDateTime);
+      final Elapsed = DateTime.now().difference(_event.startDateTime);
       setState(() {
-        _pausedElapsed = elapsed;
+        _pausedElapsed = Elapsed;
         _isPaused = true;
       });
       await _updateEvent(
         _event.copyWith(
           isStopped: true,
-          stoppedElapsedSeconds: elapsed.inSeconds,
+          stoppedElapsedSeconds: Elapsed.inSeconds,
         ),
       );
     }
@@ -400,7 +400,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final elapsed = _elapsed;
+    final Elapsed = _elapsed;
     final eventColor = _parseHex(_event.colorHex);
 
     return PopScope(
@@ -458,7 +458,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              _compactElapsed(elapsed),
+                              _compactElapsed(Elapsed),
                               style: TextStyle(
                                 color: eventColor.computeLuminance() > 0.4
                                     ? Colors.black

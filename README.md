@@ -1,4 +1,4 @@
-# elapsed
+# Elapsed
 
 A new Flutter project.
 

@@ -3,7 +3,7 @@ import 'package:home_widget/home_widget.dart';
 import 'storage_service.dart';
 
 class WidgetService {
-  static const _appGroupId = 'group.com.example.elapsed';
+  static const _appGroupId = 'group.com.example.Elapsed';
   static const _dataKey = 'events_json';
 
   /// Serialize current events and push to native home screen widgets.

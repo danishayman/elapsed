@@ -9,7 +9,7 @@ Color _parseHex(String hex) {
 
 class EventCard extends StatelessWidget {
   final EventModel event;
-  final Duration elapsed;
+  final Duration Elapsed;
   final int index;
   final String timeFormat;
   final VoidCallback onTap;
@@ -18,7 +18,7 @@ class EventCard extends StatelessWidget {
   const EventCard({
     super.key,
     required this.event,
-    required this.elapsed,
+    required this.Elapsed,
     required this.index,
     required this.timeFormat,
     required this.onTap,
@@ -28,30 +28,30 @@ class EventCard extends StatelessWidget {
   String _formatElapsed() {
     switch (timeFormat) {
       case 'Years':
-        final years = elapsed.inDays ~/ 365;
-        final remainingDays = elapsed.inDays % 365;
+        final years = Elapsed.inDays ~/ 365;
+        final remainingDays = Elapsed.inDays % 365;
         return '${years}y ${remainingDays}d';
       case 'Months':
-        final months = elapsed.inDays ~/ 30;
-        final remainingDays = elapsed.inDays % 30;
+        final months = Elapsed.inDays ~/ 30;
+        final remainingDays = Elapsed.inDays % 30;
         return '${months}m ${remainingDays}d';
       case 'Weeks':
-        final weeks = elapsed.inDays ~/ 7;
-        final remainingDays = elapsed.inDays % 7;
+        final weeks = Elapsed.inDays ~/ 7;
+        final remainingDays = Elapsed.inDays % 7;
         return '${weeks}w ${remainingDays}d';
       case 'Hours, minutes and seconds':
-        final hours = elapsed.inHours;
-        final minutes = elapsed.inMinutes % 60;
-        final seconds = elapsed.inSeconds % 60;
+        final hours = Elapsed.inHours;
+        final minutes = Elapsed.inMinutes % 60;
+        final seconds = Elapsed.inSeconds % 60;
         final hh = hours.toString().padLeft(2, '0');
         final mm = minutes.toString().padLeft(2, '0');
         final ss = seconds.toString().padLeft(2, '0');
         return '$hh:$mm:$ss';
       default: // Days
-        final days = elapsed.inDays;
-        final hours = elapsed.inHours % 24;
-        final minutes = elapsed.inMinutes % 60;
-        final seconds = elapsed.inSeconds % 60;
+        final days = Elapsed.inDays;
+        final hours = Elapsed.inHours % 24;
+        final minutes = Elapsed.inMinutes % 60;
+        final seconds = Elapsed.inSeconds % 60;
         final hh = hours.toString().padLeft(2, '0');
         final mm = minutes.toString().padLeft(2, '0');
         final ss = seconds.toString().padLeft(2, '0');
