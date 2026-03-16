@@ -139,7 +139,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
       startDateTime: startDateTime,
       colorHex: _selectedColor,
       goalDays: widget.editEvent?.goalDays,
-      timeFormat: widget.editEvent?.timeFormat ?? 'Days',
+      timeFormat:
+          widget.editEvent?.timeFormat ?? 'Hours, minutes and seconds',
       resetHistory: widget.editEvent?.resetHistory,
     );
 

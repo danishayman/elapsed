@@ -17,7 +17,7 @@ class EventModel {
     required this.startDateTime,
     required this.colorHex,
     this.goalDays,
-    this.timeFormat = 'Days',
+    this.timeFormat = 'Hours, minutes and seconds',
     List<DateTime>? resetHistory,
     this.isStopped = false,
     this.stoppedElapsedSeconds,
@@ -68,7 +68,8 @@ class EventModel {
     startDateTime: DateTime.parse(json['startDateTime'] as String),
     colorHex: json['colorHex'] as String,
     goalDays: json['goalDays'] as int?,
-    timeFormat: json['timeFormat'] as String? ?? 'Days',
+    timeFormat:
+        json['timeFormat'] as String? ?? 'Hours, minutes and seconds',
     resetHistory:
         (json['resetHistory'] as List<dynamic>?)
             ?.map((e) => DateTime.parse(e as String))

@@ -161,7 +161,7 @@ object ElapsedWidgetRenderer {
         val title = event.optString("title", "An unnamed timer").ifBlank { "An unnamed timer" }
         val color = parseColor(event.optString("colorHex", "#66A8FF"), Color.parseColor("#66A8FF"))
         val elapsedSeconds = computeElapsedSeconds(event)
-        val selectedFormat = event.optString("timeFormat", "Days")
+        val selectedFormat = event.optString("timeFormat", "Hours, minutes and seconds")
         val isStopped = event.optBoolean("isStopped", false)
         val display = buildElapsedDisplay(elapsedSeconds, selectedFormat, !isStopped)
 
