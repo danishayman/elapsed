@@ -53,127 +53,43 @@
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_small_standard_info" />
+                android:resource="@xml/widget_restart_info" />
         </receiver>
 
         <receiver
-            android:name=".WidgetSmallTransparentBlackProvider"
-            android:label="Transparent Black - Small"
+            android:name=".WidgetStandardProvider"
+            android:label="Standard"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_small_transparent_black_info" />
+                android:resource="@xml/widget_standard_info" />
         </receiver>
 
         <receiver
-            android:name=".WidgetSmallTransparentWhiteProvider"
-            android:label="Transparent White - Small"
+            android:name=".WidgetTransparentBlackProvider"
+            android:label="Transparent Black"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_small_transparent_white_info" />
+                android:resource="@xml/widget_transparent_black_info" />
         </receiver>
 
         <receiver
-            android:name=".WidgetMediumRestartProvider"
-            android:label="Restart - Medium"
+            android:name=".WidgetTransparentWhiteProvider"
+            android:label="Transparent White"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_medium_restart_info" />
-        </receiver>
-
-        <receiver
-            android:name=".WidgetMediumStandardProvider"
-            android:label="Standard - Medium"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_medium_standard_info" />
-        </receiver>
-
-        <receiver
-            android:name=".WidgetMediumTransparentBlackProvider"
-            android:label="Transparent Black - Medium"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_medium_transparent_black_info" />
-        </receiver>
-
-        <receiver
-            android:name=".WidgetMediumTransparentWhiteProvider"
-            android:label="Transparent White - Medium"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_medium_transparent_white_info" />
-        </receiver>
-
-        <receiver
-            android:name=".WidgetLargeRestartProvider"
-            android:label="Restart - Large"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_large_restart_info" />
-        </receiver>
-
-        <receiver
-            android:name=".WidgetLargeStandardProvider"
-            android:label="Standard - Large"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_large_standard_info" />
-        </receiver>
-
-        <receiver
-            android:name=".WidgetLargeTransparentBlackProvider"
-            android:label="Transparent Black - Large"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_large_transparent_black_info" />
-        </receiver>
-
-        <receiver
-            android:name=".WidgetLargeTransparentWhiteProvider"
-            android:label="Transparent White - Large"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_large_transparent_white_info" />
+                android:resource="@xml/widget_transparent_white_info" />
         </receiver>
 
         <activity

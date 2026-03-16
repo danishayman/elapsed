@@ -88,8 +88,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         final hh = hours.toString().padLeft(2, '0');
         final mm = minutes.toString().padLeft(2, '0');
         final ss = seconds.toString().padLeft(2, '0');
-        if (days > 0) return '${days}d $hh:$mm:$ss';
-        return '$hh:$mm:$ss';
+        return '${days}d $hh:$mm:$ss';
     }
   }
 

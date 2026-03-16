@@ -45,7 +45,7 @@ class StorageService {
 
   static Future<String> loadTimeFormat() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_timeFormatKey) ?? 'Days';
+    return prefs.getString(_timeFormatKey) ?? 'Hours, minutes and seconds';
   }
 
   static Future<void> saveTimeFormat(String format) async {

@@ -68,8 +68,9 @@ class WidgetConfigActivity : Activity() {
             val prefs = getSharedPreferences("HomeWidgetPreferences", MODE_PRIVATE)
             prefs.edit().putString("widget_${appWidgetId}_event_id", eventId).apply()
 
-            val manager = AppWidgetManager.getInstance(this)
-            ElapsedWidgetRenderer.updateWidgetById(this, manager, appWidgetId)
+            // Update the widget immediately
+            val appWidgetManager = AppWidgetManager.getInstance(this)
+            ElapsedWidgetRenderer.updateWidgetById(this, appWidgetManager, appWidgetId)
 
             val result = Intent()
             result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -87,8 +88,7 @@ class WidgetConfigActivity : Activity() {
             for (i in 0 until arr.length()) {
                 events.add(arr.getJSONObject(i))
             }
-        } catch (_: Exception) {
-        }
+        } catch (_: Exception) {}
     }
 
     private inner class EventAdapter : BaseAdapter() {

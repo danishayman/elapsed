@@ -7,18 +7,11 @@ class WidgetService {
   static const _dataKey = 'events_json';
 
   static const _androidProviderNames = [
-    'WidgetSmallRestartProvider',
-    'WidgetSmallStandardProvider',
-    'WidgetSmallTransparentBlackProvider',
-    'WidgetSmallTransparentWhiteProvider',
-    'WidgetMediumRestartProvider',
-    'WidgetMediumStandardProvider',
-    'WidgetMediumTransparentBlackProvider',
-    'WidgetMediumTransparentWhiteProvider',
-    'WidgetLargeRestartProvider',
-    'WidgetLargeStandardProvider',
-    'WidgetLargeTransparentBlackProvider',
-    'WidgetLargeTransparentWhiteProvider',
+    'WidgetSimpleProvider',
+    'WidgetRestartProvider',
+    'WidgetStandardProvider',
+    'WidgetTransparentBlackProvider',
+    'WidgetTransparentWhiteProvider',
   ];
 
   /// Serialize current events and push to native home screen widgets.
@@ -37,7 +30,7 @@ class WidgetService {
         );
       }
     } catch (_) {
-      // Silently fail - widgets are best-effort
+      // Silently fail - widgets are best-effort.
     }
   }
 }
