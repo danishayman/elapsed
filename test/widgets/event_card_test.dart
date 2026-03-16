@@ -20,7 +20,7 @@ Future<void> _pumpCard(
       home: Scaffold(
         body: ReorderableListView.builder(
           itemCount: 1,
-          onReorder: (_, __) {},
+          onReorder: (_, _) {},
           itemBuilder: (_, index) => EventCard(
             key: ValueKey(event.id),
             event: event,
