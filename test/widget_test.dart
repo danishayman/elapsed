@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Elapsed/main.dart';
+import 'package:elapsed/main.dart';
 
 void main() {
   testWidgets('App renders', (WidgetTester tester) async {

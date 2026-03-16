@@ -13,14 +13,6 @@ class FormatScreen extends StatefulWidget {
 class _FormatScreenState extends State<FormatScreen> {
   late String _selected;
 
-  static const _formats = [
-    'Years',
-    'Months',
-    'Weeks',
-    'Days',
-    'Hours, minutes and seconds',
-  ];
-
   @override
   void initState() {
     super.initState();
