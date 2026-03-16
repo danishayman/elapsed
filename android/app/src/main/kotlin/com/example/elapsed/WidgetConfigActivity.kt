@@ -23,20 +23,18 @@ class WidgetConfigActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Light status bar with white background
         window.statusBarColor = Color.WHITE
         window.decorView.systemUiVisibility = (
             View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-        )
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            )
 
-        // Default result = CANCELED so backing out cancels widget placement
+        // Backing out or closing the screen should cancel widget placement.
         setResult(RESULT_CANCELED)
 
-        // Get the widget ID from the intent
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
+            AppWidgetManager.INVALID_APPWIDGET_ID,
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
@@ -46,7 +44,6 @@ class WidgetConfigActivity : Activity() {
 
         setContentView(R.layout.activity_widget_config)
 
-        // Close button finishes the activity (cancels widget placement)
         findViewById<ImageView>(R.id.close_button).setOnClickListener {
             finish()
         }
@@ -65,20 +62,18 @@ class WidgetConfigActivity : Activity() {
         listView.adapter = EventAdapter()
         listView.setOnItemClickListener { _, _, position, _ ->
             val selectedEvent = events[position]
-            val eventId = selectedEvent.getString("id")
+            val eventId = selectedEvent.optString("id", "")
+            if (eventId.isBlank()) return@setOnItemClickListener
 
-            // Save the selected event ID for this widget instance
             val prefs = getSharedPreferences("HomeWidgetPreferences", MODE_PRIVATE)
             prefs.edit().putString("widget_${appWidgetId}_event_id", eventId).apply()
 
-            // Update the widget immediately
-            val appWidgetManager = AppWidgetManager.getInstance(this)
-            updateWidgetById(appWidgetManager, appWidgetId)
+            val manager = AppWidgetManager.getInstance(this)
+            ElapsedWidgetRenderer.updateWidgetById(this, manager, appWidgetId)
 
-            // Return success
-            val resultValue = Intent()
-            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            setResult(RESULT_OK, resultValue)
+            val result = Intent()
+            result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            setResult(RESULT_OK, result)
             finish()
         }
     }
@@ -92,19 +87,7 @@ class WidgetConfigActivity : Activity() {
             for (i in 0 until arr.length()) {
                 events.add(arr.getJSONObject(i))
             }
-        } catch (_: Exception) {}
-    }
-
-    private fun updateWidgetById(appWidgetManager: AppWidgetManager, widgetId: Int) {
-        val info = appWidgetManager.getAppWidgetInfo(widgetId) ?: return
-        val providerName = info.provider?.className ?: return
-        when {
-            providerName.contains("Small") ->
-                TimeSinceSmallWidgetProvider.updateSmallWidget(this, appWidgetManager, widgetId)
-            providerName.contains("Medium") ->
-                TimeSinceMediumWidgetProvider.updateMediumWidget(this, appWidgetManager, widgetId)
-            providerName.contains("Large") ->
-                TimeSinceLargeWidgetProvider.updateLargeWidget(this, appWidgetManager, widgetId)
+        } catch (_: Exception) {
         }
     }
 
@@ -115,33 +98,35 @@ class WidgetConfigActivity : Activity() {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view = convertView ?: layoutInflater.inflate(
-                R.layout.widget_config_item, parent, false
+                R.layout.widget_config_item,
+                parent,
+                false,
             )
 
             val event = events[position]
-            val title = event.getString("title")
-            val colorHex = event.optString("colorHex", "#007BFF")
+            val title = event.optString("title", "An unnamed timer").ifBlank { "An unnamed timer" }
+            val colorHex = event.optString("colorHex", "#66A8FF")
 
             val badgeView = view.findViewById<TextView>(R.id.item_badge)
             badgeView.text = title
 
             try {
                 val color = Color.parseColor(colorHex)
-
-                // Rounded pill background
-                val pill = GradientDrawable()
-                pill.shape = GradientDrawable.RECTANGLE
-                pill.cornerRadius = 24f * resources.displayMetrics.density
-                pill.setColor(color)
+                val pill = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 24f * resources.displayMetrics.density
+                    setColor(color)
+                }
                 badgeView.background = pill
 
-                // Text color based on luminance
                 val r = Color.red(color) / 255.0
                 val g = Color.green(color) / 255.0
                 val b = Color.blue(color) / 255.0
                 val luminance = 0.299 * r + 0.587 * g + 0.114 * b
-                badgeView.setTextColor(if (luminance > 0.4) Color.BLACK else Color.WHITE)
-            } catch (_: Exception) {}
+                badgeView.setTextColor(if (luminance > 0.5) Color.BLACK else Color.WHITE)
+            } catch (_: Exception) {
+                badgeView.setTextColor(Color.BLACK)
+            }
 
             return view
         }

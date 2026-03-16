@@ -93,38 +93,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
-  String _fullElapsed(Duration d) {
-    final days = d.inDays;
-    final hours = d.inHours % 24;
-    final minutes = d.inMinutes % 60;
-    final seconds = d.inSeconds % 60;
-    return '$days days, $hours hours, $minutes minutes, $seconds seconds';
-  }
-
-  String _formattedElapsed(Duration d) {
-    switch (_selectedFormat) {
-      case 'Weeks':
-        final weeks = d.inDays ~/ 7;
-        final remainingDays = d.inDays % 7;
-        return '$weeks weeks, $remainingDays days';
-      case 'Months':
-        final months = d.inDays ~/ 30;
-        final remainingDays = d.inDays % 30;
-        return '$months months, $remainingDays days';
-      case 'Years':
-        final years = d.inDays ~/ 365;
-        final remainingDays = d.inDays % 365;
-        return '$years years, $remainingDays days';
-      case 'Hours, minutes and seconds':
-        final hours = d.inHours;
-        final minutes = d.inMinutes % 60;
-        final seconds = d.inSeconds % 60;
-        return '$hours hours, $minutes minutes, $seconds seconds';
-      default:
-        return _fullElapsed(d);
-    }
-  }
-
   String _formatStartDateShort(DateTime d) {
     final day = d.day.toString().padLeft(2, '0');
     final month = d.month.toString().padLeft(2, '0');
@@ -221,15 +189,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _stopEvent() async {
     if (!_isPaused) {
-      final Elapsed = DateTime.now().difference(_event.startDateTime);
+      final elapsed = DateTime.now().difference(_event.startDateTime);
       setState(() {
-        _pausedElapsed = Elapsed;
+        _pausedElapsed = elapsed;
         _isPaused = true;
       });
       await _updateEvent(
         _event.copyWith(
           isStopped: true,
-          stoppedElapsedSeconds: Elapsed.inSeconds,
+          stoppedElapsedSeconds: elapsed.inSeconds,
         ),
       );
     }
@@ -400,7 +368,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Elapsed = _elapsed;
+    final elapsed = _elapsed;
     final eventColor = _parseHex(_event.colorHex);
 
     return PopScope(
@@ -458,7 +426,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              _compactElapsed(Elapsed),
+                              _compactElapsed(elapsed),
                               style: TextStyle(
                                 color: eventColor.computeLuminance() > 0.4
                                     ? Colors.black
