@@ -188,15 +188,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _stopEvent() async {
     if (!_isPaused) {
-      final Elapsed = DateTime.now().difference(_event.startDateTime);
+      final elapsed = DateTime.now().difference(_event.startDateTime);
       setState(() {
-        _pausedElapsed = Elapsed;
+        _pausedElapsed = elapsed;
         _isPaused = true;
       });
       await _updateEvent(
         _event.copyWith(
           isStopped: true,
-          stoppedElapsedSeconds: Elapsed.inSeconds,
+          stoppedElapsedSeconds: elapsed.inSeconds,
         ),
       );
     }
@@ -367,7 +367,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Elapsed = _elapsed;
+    final elapsed = _elapsed;
     final eventColor = _parseHex(_event.colorHex);
 
     return PopScope(
@@ -425,7 +425,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              _compactElapsed(Elapsed),
+                              _compactElapsed(elapsed),
                               style: TextStyle(
                                 color: eventColor.computeLuminance() > 0.4
                                     ? Colors.black

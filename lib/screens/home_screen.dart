@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       itemBuilder: (context, index) {
                         final event = _events[index];
-                        final Elapsed =
+                        final elapsed =
                             (event.isStopped &&
                                 event.stoppedElapsedSeconds != null)
                             ? Duration(seconds: event.stoppedElapsedSeconds!)
@@ -184,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return EventCard(
                           key: ValueKey(event.id),
                           event: event,
-                          Elapsed: Elapsed,
+                          elapsed: elapsed,
                           index: index,
                           timeFormat: event.timeFormat,
                           onTap: () => _navigateToDetail(event),
