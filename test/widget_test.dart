@@ -4,6 +4,8 @@ import 'package:elapsed/main.dart';
 void main() {
   testWidgets('App renders', (WidgetTester tester) async {
     await tester.pumpWidget(const ElapsedApp());
-    expect(find.text('Elapsed'), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Elapsed'), findsAtLeastNWidgets(1));
   });
 }

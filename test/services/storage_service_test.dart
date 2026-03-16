@@ -42,4 +42,13 @@ void main() {
     final afterDeleteLoad = await StorageService.loadEvents();
     expect(afterDeleteLoad, isEmpty);
   });
+
+  test('saves and loads selected time format', () async {
+    final defaultFormat = await StorageService.loadTimeFormat();
+    expect(defaultFormat, 'Hours, minutes and seconds');
+
+    await StorageService.saveTimeFormat('Weeks');
+    final savedFormat = await StorageService.loadTimeFormat();
+    expect(savedFormat, 'Weeks');
+  });
 }
