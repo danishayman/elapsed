@@ -65,7 +65,8 @@ class WidgetConfigActivity : Activity() {
         listView.adapter = EventAdapter()
         listView.setOnItemClickListener { _, _, position, _ ->
             val selectedEvent = events[position]
-            val eventId = selectedEvent.getString("id")
+            val eventId = selectedEvent.optString("id", "")
+            if (eventId.isBlank()) return@setOnItemClickListener
 
             // Save the selected event ID for this widget instance
             val prefs = getSharedPreferences("HomeWidgetPreferences", MODE_PRIVATE)
@@ -73,7 +74,7 @@ class WidgetConfigActivity : Activity() {
 
             // Update the widget immediately
             val appWidgetManager = AppWidgetManager.getInstance(this)
-            updateWidgetById(appWidgetManager, appWidgetId)
+            ElapsedWidgetRenderer.updateWidgetById(this, appWidgetManager, appWidgetId)
 
             // Return success
             val resultValue = Intent()
@@ -93,19 +94,6 @@ class WidgetConfigActivity : Activity() {
                 events.add(arr.getJSONObject(i))
             }
         } catch (_: Exception) {}
-    }
-
-    private fun updateWidgetById(appWidgetManager: AppWidgetManager, widgetId: Int) {
-        val info = appWidgetManager.getAppWidgetInfo(widgetId) ?: return
-        val providerName = info.provider?.className ?: return
-        when {
-            providerName.contains("Small") ->
-                TimeSinceSmallWidgetProvider.updateSmallWidget(this, appWidgetManager, widgetId)
-            providerName.contains("Medium") ->
-                TimeSinceMediumWidgetProvider.updateMediumWidget(this, appWidgetManager, widgetId)
-            providerName.contains("Large") ->
-                TimeSinceLargeWidgetProvider.updateLargeWidget(this, appWidgetManager, widgetId)
-        }
     }
 
     private inner class EventAdapter : BaseAdapter() {

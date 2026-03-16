@@ -88,40 +88,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         final hh = hours.toString().padLeft(2, '0');
         final mm = minutes.toString().padLeft(2, '0');
         final ss = seconds.toString().padLeft(2, '0');
-        if (days > 0) return '${days}d $hh:$mm:$ss';
-        return '$hh:$mm:$ss';
-    }
-  }
-
-  String _fullElapsed(Duration d) {
-    final days = d.inDays;
-    final hours = d.inHours % 24;
-    final minutes = d.inMinutes % 60;
-    final seconds = d.inSeconds % 60;
-    return '$days days, $hours hours, $minutes minutes, $seconds seconds';
-  }
-
-  String _formattedElapsed(Duration d) {
-    switch (_selectedFormat) {
-      case 'Weeks':
-        final weeks = d.inDays ~/ 7;
-        final remainingDays = d.inDays % 7;
-        return '$weeks weeks, $remainingDays days';
-      case 'Months':
-        final months = d.inDays ~/ 30;
-        final remainingDays = d.inDays % 30;
-        return '$months months, $remainingDays days';
-      case 'Years':
-        final years = d.inDays ~/ 365;
-        final remainingDays = d.inDays % 365;
-        return '$years years, $remainingDays days';
-      case 'Hours, minutes and seconds':
-        final hours = d.inHours;
-        final minutes = d.inMinutes % 60;
-        final seconds = d.inSeconds % 60;
-        return '$hours hours, $minutes minutes, $seconds seconds';
-      default:
-        return _fullElapsed(d);
+        return '${days}d $hh:$mm:$ss';
     }
   }
 
